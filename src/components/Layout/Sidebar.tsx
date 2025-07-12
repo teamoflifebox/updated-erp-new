@@ -27,8 +27,6 @@ const Sidebar: React.FC = () => {
           { id: 'attendance', label: 'Attendance', icon: Calendar, path: '/attendance' },
           { id: 'marks', label: 'Marks', icon: BookOpen, path: '/marks' },
           { id: 'fees', label: 'Fees', icon: CreditCard, path: '/fees' },
-          { id: 'documents', label: 'Documents', icon: FileText, path: '/documents' },
-          { id: 'notifications', label: 'Notifications', icon: Bell, path: '/notifications' },
           { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
         ];
       
@@ -79,7 +77,7 @@ const Sidebar: React.FC = () => {
   return (
     <div className="relative">
       <div 
-        className={`transition-all duration-300 ${isExpanded ? "w-64" : "w-20"} min-h-screen bg-slate-800 text-white fixed left-0 top-0 pt-16 z-40 shadow-xl`}
+        className={`transition-all duration-300 ${isExpanded ? "w-64" : "w-20"} min-h-screen bg-slate-800 text-white fixed left-0 top-0 pt-16 z-40 shadow-xl flex flex-col`}
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => setIsExpanded(false)}
       >
@@ -95,61 +93,62 @@ const Sidebar: React.FC = () => {
         <div className={`px-4 py-5 ${isExpanded ? "" : "flex justify-center"}`}>
           <div className={`flex items-center ${isExpanded ? "gap-3" : "justify-center"} mb-2`}>
             <div className="bg-gradient-to-r from-[#1E3A8A] to-[#9333EA] p-2 rounded-lg shadow-md">
-              <Layers className="w-5 h-5 text-white" />
+              <Menu className="w-5 h-5 text-white" />
             </div>
-            <span className={`font-medium text-white ${isExpanded ? "" : "hidden"}`}>Navigation</span>
+            <span className={`font-medium text-white ${isExpanded ? "" : "hidden"}`}>Menu</span>
           </div>
           <div className={`h-px bg-slate-700 ${isExpanded ? "" : "hidden"} mt-2`}></div>
         </div>
         
-        {/* Menu Items */}
-        <nav className="px-3 py-2 space-y-1">
-          {menuItems.map((item, index) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            
-            return (
-              <button
-                key={item.id}
-                onClick={() => navigate(item.path)}
-                className={`w-full text-left transition-all duration-200 group flex items-center px-3 py-2.5 rounded-lg ${
-                  isActive ? 'bg-gradient-to-r from-[#1E3A8A] to-[#9333EA] text-white' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
-                } ${isExpanded ? "justify-start" : "justify-center"} overflow-hidden`}
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <Icon className={`w-5 h-5 min-w-5 transition-all duration-200 ${
-                  isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
-                }`} />
-                <span className={`font-medium truncate ${isExpanded ? "ml-3" : "hidden"}`}>{item.label}</span>
-                
-                {/* Active Indicator */}
-                {isActive && (
-                  <div className={`ml-auto flex items-center ${isExpanded ? "" : "hidden"}`}>
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  </div>
-                )}
-                
-                {/* New Feature Indicator */}
-                {item.isNew && (
-                  <div className={`ml-auto ${isExpanded ? "" : "absolute -top-1 -right-1"}`}>
-                    <span className="px-1.5 py-0.5 text-xs bg-[#9333EA] text-white rounded-full text-center">
-                      {isExpanded ? "New" : ""}
-                    </span>
-                  </div>
-                )}
-                
-                {/* WhatsApp Indicator */}
-                {item.id === 'whatsapp' && (
-                  <div className={`ml-auto w-2 h-2 bg-[#9333EA] rounded-full ${isExpanded ? "" : "absolute -top-1 -right-1"}`}></div>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+        {/* Menu Items with scrollable area */}
+        <div className="flex-1 overflow-y-auto px-3 py-2">
+          <nav className="space-y-1">
+            {menuItems.map((item, index) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => navigate(item.path)}
+                  className={`w-full text-left transition-all duration-200 group flex items-center px-3 py-2.5 rounded-lg ${
+                    isActive ? 'bg-gradient-to-r from-[#1E3A8A] to-[#9333EA] text-white' : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  } ${isExpanded ? "justify-start" : "justify-center"} overflow-hidden`}
+                >
+                  <Icon className={`w-5 h-5 min-w-5 transition-all duration-200 ${
+                    isActive ? 'text-white' : 'text-slate-300 group-hover:text-white'
+                  }`} />
+                  <span className={`font-medium truncate ${isExpanded ? "ml-3" : "hidden"}`}>{item.label}</span>
+                  
+                  {/* Active Indicator */}
+                  {isActive && (
+                    <div className={`ml-auto flex items-center ${isExpanded ? "" : "hidden"}`}>
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  )}
+                  
+                  {/* New Feature Indicator */}
+                  {item.isNew && (
+                    <div className={`ml-auto ${isExpanded ? "" : "absolute -top-1 -right-1"}`}>
+                      <span className="px-1.5 py-0.5 text-xs bg-[#9333EA] text-white rounded-full text-center">
+                        {isExpanded ? "New" : ""}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* WhatsApp Indicator */}
+                  {item.id === 'whatsapp' && (
+                    <div className={`ml-auto w-2 h-2 bg-[#9333EA] rounded-full ${isExpanded ? "" : "absolute -top-1 -right-1"}`}></div>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
 
-        {/* Bottom Card */}
-        <div className={`absolute bottom-4 left-0 right-0 mx-3 p-3 bg-slate-700/50 backdrop-blur-sm rounded-lg border border-slate-600/30 ${isExpanded ? "" : "hidden"}`}>
-          <div className={`flex items-center gap-2 mb-2`}>
+        {/* Bottom Card - Adjusted with proper spacing */}
+        <div className={`p-3 bg-slate-700/50 backdrop-blur-sm rounded-lg border border-slate-600/30 mx-3 mb-4 mt-auto ${isExpanded ? "" : "hidden"}`}>
+          <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 bg-gradient-to-r from-[#1E3A8A] to-[#9333EA] rounded-lg flex items-center justify-center shadow-md">
               <GraduationCap className="w-4 h-4 text-white" />
             </div>
@@ -162,7 +161,6 @@ const Sidebar: React.FC = () => {
             Empowering minds with technology
           </p>
           
-          {/* Progress Bar */}
           <div className="mt-2 w-full bg-slate-600/50 rounded-full h-1">
             <div className="bg-gradient-to-r from-[#1E3A8A] to-[#9333EA] h-1 rounded-full w-3/4"></div>
           </div>
@@ -170,7 +168,7 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
       
-      {/* Main content spacer to prevent content from being hidden behind the sidebar */}
+      {/* Main content spacer */}
       <div className={`${isExpanded ? "w-64" : "w-20"} transition-all duration-300`}></div>
     </div>
   );
