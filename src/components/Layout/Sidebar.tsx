@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Home, User, Calendar, BookOpen, Users, CreditCard, Bell, BarChart3,
   Settings, FileText, GraduationCap, Building2, MessageCircle,
-  Clock, TrendingUp, ChevronRight, Menu, Layers
+  Clock, TrendingUp, ChevronRight, Menu, Layers,
+  Paperclip
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -27,6 +28,7 @@ const Sidebar: React.FC = () => {
           { id: 'attendance', label: 'Attendance', icon: Calendar, path: '/attendance' },
           { id: 'marks', label: 'Marks', icon: BookOpen, path: '/marks' },
           { id: 'fees', label: 'Fees', icon: CreditCard, path: '/fees' },
+          { id: 'documents', label : 'Documents', icon: Paperclip , path:'/documents'},
           { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
         ];
       
