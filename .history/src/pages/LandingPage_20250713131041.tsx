@@ -196,7 +196,9 @@ function LandingPage(): JSX.Element {
                 >
                         <LogIn className="w-4 h-4" />
                         <span>Login</span>
-                        
+                        <div className="bg-orange-500 text-white p-4 rounded-lg">
+  Test Orange Box
+</div>
                 </button>
             </div>
 

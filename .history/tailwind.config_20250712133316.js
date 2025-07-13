@@ -1,19 +1,10 @@
 /** @type {import('tailwindcss').Config} */
-// import { orange } from 'tailwindcss/colors';
-import { orange as twOrange } from 'tailwindcss/colors';
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
-   safelist: [
-    'bg-orange-500',
-    'bg-orange-600',
-    'hover:bg-orange-600',
-    'focus:ring-orange-400',
-  ],
   theme: {
     extend: {
       colors: {
-        orange:twOrange,
         primary: {
           50: '#eef2ff',
           100: '#e0e7ff',

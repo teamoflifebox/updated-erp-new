@@ -162,6 +162,18 @@ function LandingPage(): JSX.Element {
     setUserData(null);
   };
 
+//   if (isLoggedIn) {
+//     switch (userType) {
+//       case 'student':
+//         return <StudentDashboard userData={userData} onLogout={handleLogout} />;
+//       case 'faculty':
+//         return <FacultyDashboard userData={userData} onLogout={handleLogout} />;
+//       case 'admin':
+//         return <AdminDashboard userData={userData} onLogout={handleLogout} />;
+//       default:
+//         return <LoginPage onLogin={handleLogin} />;
+//     }
+//   }
 
   return (
     <div className="min-h-screen bg-white">
@@ -196,7 +208,6 @@ function LandingPage(): JSX.Element {
                 >
                         <LogIn className="w-4 h-4" />
                         <span>Login</span>
-                        
                 </button>
             </div>
 

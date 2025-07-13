@@ -1,54 +1,48 @@
 import React, { useState, useEffect } from 'react';
-
-import LoginModal from './LoginModal';
-import {
-  ChevronDown, Users, Award, Calendar, MapPin, Phone, Mail, ExternalLink,
-  Menu, X, Star, Building, GraduationCap, Trophy, ChevronRight, PlayCircle,
-  Globe, BookOpen, Zap, Target, TrendingUp, Facebook, Instagram, Linkedin, Youtube, CheckCircle, LogIn
+import LoginPage from './components/LoginPage';
+import StudentDashboard from './components/StudentDashboard';
+import FacultyDashboard from './components/FacultyDashboard';
+import AdminDashboard from './components/AdminDashboard';
+import { 
+  ChevronDown, 
+  Users, 
+  Award, 
+  Calendar, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  ExternalLink,
+  Menu,
+  X,
+  Star,
+  Building,
+  GraduationCap,
+  Trophy,
+  ChevronRight,
+  PlayCircle,
+  Globe,
+  BookOpen,
+  Zap,
+  Target,
+  TrendingUp,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Youtube,
+  CheckCircle
 } from 'lucide-react';
-import LoginPage from './LoginPage';
+import LoginModal from './LoginModal';
 
-interface UserData {
-  name?: string;
-  email?: string;
-  [key: string]: any;
-}
+function LandingPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState('');
+  const [userData, setUserData] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+const [showLoginModal,setShowLoginModal] = useState(false)
 
-interface Course {
-  name: string;
-  code: string;
-  icon: JSX.Element;
-  duration: string;
-}
-
-interface Event {
-  title: string;
-  date: string;
-  description: string;
-  type: string;
-}
-
-interface Company {
-  name: string;
-  logo: string;
-}
-
-interface Faculty {
-  name: string;
-  subject: string;
-  experience: string;
-  image: string;
-}
-
-function LandingPage(): JSX.Element {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [userType, setUserType] = useState<string>('');
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [currentSlide, setCurrentSlide] = useState<number>(0);
-  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
-
-  const galleryImages: string[] = [
+  // Gallery images
+  const galleryImages = [
     'https://images.pexels.com/photos/159844/cellular-education-classroom-159844.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/5212317/pexels-photo-5212317.jpeg?auto=compress&cs=tinysrgb&w=800',
     'https://images.pexels.com/photos/3184325/pexels-photo-3184325.jpeg?auto=compress&cs=tinysrgb&w=800',
@@ -57,6 +51,7 @@ function LandingPage(): JSX.Element {
     'https://images.pexels.com/photos/1516440/pexels-photo-1516440.jpeg?auto=compress&cs=tinysrgb&w=800'
   ];
 
+  // Auto-scroll gallery
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % galleryImages.length);
@@ -64,7 +59,7 @@ function LandingPage(): JSX.Element {
     return () => clearInterval(interval);
   }, [galleryImages.length]);
 
-  const courses: Course[] = [
+  const courses = [
     { name: 'Computer Science Engineering', code: 'CSE', icon: <BookOpen className="w-8 h-8" />, duration: '4 Years' },
     { name: 'Electronics & Communication', code: 'ECE', icon: <Zap className="w-8 h-8" />, duration: '4 Years' },
     { name: 'Electrical Engineering', code: 'EEE', icon: <Target className="w-8 h-8" />, duration: '4 Years' },
@@ -73,7 +68,7 @@ function LandingPage(): JSX.Element {
     { name: 'Information Technology', code: 'IT', icon: <Globe className="w-8 h-8" />, duration: '4 Years' }
   ];
 
-  const events: Event[] = [
+  const events = [
     {
       title: 'Annual Tech Fest 2024',
       date: '15-17 March 2024',
@@ -100,22 +95,58 @@ function LandingPage(): JSX.Element {
     }
   ];
 
-  const companies: Company[] = [
-    { name: 'TCS', logo: 'https://logos-world.net/wp-content/uploads/2020/09/TCS-Logo.png' },
-    { name: 'Infosys', logo: 'https://logos-world.net/wp-content/uploads/2020/06/Infosys-Logo.png' },
-    { name: 'Wipro', logo: 'https://logos-world.net/wp-content/uploads/2020/09/Wipro-Logo.png' },
-    { name: 'Accenture', logo: 'https://logos-world.net/wp-content/uploads/2020/06/Accenture-Logo.png' },
-    { name: 'Cognizant', logo: 'https://logos-world.net/wp-content/uploads/2020/06/Cognizant-Logo.png' },
-    { name: 'HCL', logo: 'https://logos-world.net/wp-content/uploads/2020/09/HCL-Logo.png' },
-    { name: 'Tech Mahindra', logo: 'https://logos-world.net/wp-content/uploads/2020/09/Tech-Mahindra-Logo.png' },
-    { name: 'IBM', logo: 'https://logos-world.net/wp-content/uploads/2020/09/IBM-Logo.png' },
-    { name: 'Microsoft', logo: 'https://logos-world.net/wp-content/uploads/2020/06/Microsoft-Logo.png' },
-    { name: 'Google', logo: 'https://logos-world.net/wp-content/uploads/2020/09/Google-Logo.png' },
-    { name: 'Amazon', logo: 'https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo.png' },
-    { name: 'Capgemini', logo: 'https://logos-world.net/wp-content/uploads/2020/06/Capgemini-Logo.png' }
+  const companies = [
+    {
+      name: 'TCS',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/09/TCS-Logo.png'
+    },
+    {
+      name: 'Infosys',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/06/Infosys-Logo.png'
+    },
+    {
+      name: 'Wipro',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/09/Wipro-Logo.png'
+    },
+    {
+      name: 'Accenture',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/06/Accenture-Logo.png'
+    },
+    {
+      name: 'Cognizant',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/06/Cognizant-Logo.png'
+    },
+    {
+      name: 'HCL',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/09/HCL-Logo.png'
+    },
+    {
+      name: 'Tech Mahindra',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/09/Tech-Mahindra-Logo.png'
+    },
+    {
+      name: 'IBM',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/09/IBM-Logo.png'
+    },
+    {
+      name: 'Microsoft',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/06/Microsoft-Logo.png'
+    },
+    {
+      name: 'Google',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/09/Google-Logo.png'
+    },
+    {
+      name: 'Amazon',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/04/Amazon-Logo.png'
+    },
+    {
+      name: 'Capgemini',
+      logo: 'https://logos-world.net/wp-content/uploads/2020/06/Capgemini-Logo.png'
+    }
   ];
 
-  const faculty: Faculty[] = [
+  const faculty = [
     {
       name: 'Dr. Sarah Johnson',
       subject: 'Computer Science',
@@ -150,7 +181,7 @@ function LandingPage(): JSX.Element {
     setIsMenuOpen(false);
   };
 
-  const handleLogin = (type: string, data: UserData) => {
+  const handleLogin = (type: string, data: any) => {
     setUserType(type);
     setUserData(data);
     setIsLoggedIn(true);
@@ -162,10 +193,23 @@ function LandingPage(): JSX.Element {
     setUserData(null);
   };
 
+  // If logged in, show appropriate dashboard
+  if (isLoggedIn) {
+    switch (userType) {
+      case 'student':
+        return <StudentDashboard userData={userData} onLogout={handleLogout} />;
+      case 'faculty':
+        return <FacultyDashboard userData={userData} onLogout={handleLogout} />;
+      case 'admin':
+        return <AdminDashboard userData={userData} onLogout={handleLogout} />;
+      default:
+        return <LoginPage onLogin={handleLogin} />;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white">
-     {/* Sticky Announcement Bar */}
+      {/* Sticky Announcement Bar */}
       <div className="bg-orange-600 text-white py-2 px-4 text-center text-sm font-medium">
         <span className="flex items-center justify-center gap-2">
           <span className="animate-pulse">🚨</span>
@@ -190,14 +234,12 @@ function LandingPage(): JSX.Element {
               <button onClick={() => scrollToSection('events')} className="text-gray-700 hover:text-orange-600 transition-colors">Events</button>
               <button onClick={() => scrollToSection('placements')} className="text-gray-700 hover:text-orange-600 transition-colors">Placements</button>
               <button onClick={() => scrollToSection('contact')} className="text-gray-700 hover:text-orange-600 transition-colors">Contact</button>
-               <button 
-                    onClick={() => setShowLoginModal(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-lg"
-                >
-                        <LogIn className="w-4 h-4" />
-                        <span>Login</span>
-                        
-                </button>
+              <button 
+                onClick={() => setIsLoggedIn(true)}
+                className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
+              >
+                Login
+              </button>
             </div>
 
             {/* Mobile menu button */}
@@ -221,7 +263,7 @@ function LandingPage(): JSX.Element {
               <button onClick={() => scrollToSection('contact')} className="block w-full text-left px-3 py-2 text-gray-700 hover:text-orange-600 transition-colors">Contact</button>
            <button 
                 onClick={() => setShowLoginModal(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-lg"
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Login</span>
@@ -232,7 +274,8 @@ function LandingPage(): JSX.Element {
         )}
       </nav>
 
-     
+      {/* Show login page when login button is clicked */}
+      {isLoggedIn && !userType && <LoginPage onLogin={handleLogin} />}
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-
+import LoginPage from './components/LoginPage';
+import StudentDashboard from './components/StudentDashboard';
+import FacultyDashboard from './components/FacultyDashboard';
+import AdminDashboard from './components/AdminDashboard';
 import LoginModal from './LoginModal';
 import {
   ChevronDown, Users, Award, Calendar, MapPin, Phone, Mail, ExternalLink,
   Menu, X, Star, Building, GraduationCap, Trophy, ChevronRight, PlayCircle,
   Globe, BookOpen, Zap, Target, TrendingUp, Facebook, Instagram, Linkedin, Youtube, CheckCircle, LogIn
 } from 'lucide-react';
-import LoginPage from './LoginPage';
 
 interface UserData {
   name?: string;
@@ -162,6 +164,18 @@ function LandingPage(): JSX.Element {
     setUserData(null);
   };
 
+  if (isLoggedIn) {
+    switch (userType) {
+      case 'student':
+        return <StudentDashboard userData={userData} onLogout={handleLogout} />;
+      case 'faculty':
+        return <FacultyDashboard userData={userData} onLogout={handleLogout} />;
+      case 'admin':
+        return <AdminDashboard userData={userData} onLogout={handleLogout} />;
+      default:
+        return <LoginPage onLogin={handleLogin} />;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -190,14 +204,12 @@ function LandingPage(): JSX.Element {
               <button onClick={() => scrollToSection('events')} className="text-gray-700 hover:text-orange-600 transition-colors">Events</button>
               <button onClick={() => scrollToSection('placements')} className="text-gray-700 hover:text-orange-600 transition-colors">Placements</button>
               <button onClick={() => scrollToSection('contact')} className="text-gray-700 hover:text-orange-600 transition-colors">Contact</button>
-               <button 
-                    onClick={() => setShowLoginModal(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-lg"
-                >
-                        <LogIn className="w-4 h-4" />
-                        <span>Login</span>
-                        
-                </button>
+              <button 
+                onClick={() => setIsLoggedIn(true)}
+                className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
+              >
+                Login
+              </button>
             </div>
 
             {/* Mobile menu button */}
@@ -221,7 +233,7 @@ function LandingPage(): JSX.Element {
               <button onClick={() => scrollToSection('contact')} className="block w-full text-left px-3 py-2 text-gray-700 hover:text-orange-600 transition-colors">Contact</button>
            <button 
                 onClick={() => setShowLoginModal(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-lg"
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Login</span>
@@ -232,7 +244,8 @@ function LandingPage(): JSX.Element {
         )}
       </nav>
 
-     
+      {/* Show login page when login button is clicked */}
+      {isLoggedIn && !userType && <LoginPage onLogin={handleLogin} />}
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">

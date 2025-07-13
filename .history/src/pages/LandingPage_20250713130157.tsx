@@ -192,11 +192,10 @@ function LandingPage(): JSX.Element {
               <button onClick={() => scrollToSection('contact')} className="text-gray-700 hover:text-orange-600 transition-colors">Contact</button>
                <button 
                     onClick={() => setShowLoginModal(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-lg"
+                    className="w-full bg-orange-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-orange-600 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                         <LogIn className="w-4 h-4" />
                         <span>Login</span>
-                        
                 </button>
             </div>
 

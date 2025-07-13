@@ -196,7 +196,6 @@ function LandingPage(): JSX.Element {
                 >
                         <LogIn className="w-4 h-4" />
                         <span>Login</span>
-                        
                 </button>
             </div>
 
