@@ -196,12 +196,12 @@ const LandingPage: React.FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button 
-                onClick={() => setShowLoginModal(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Access ERP Portal</span>
-              </button>
+                  onClick={() => navigate('/login')}
+                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-[#1E3A8A] to-[#9333EA] text-white rounded-lg hover:from-[#1E3A8A]/90 hover:to-[#9333EA]/90 transition-all shadow-lg transform hover:scale-105"
+                >
+                  <LogIn className="w-5 h-5" />
+                  <span>Access ERP Portal</span>
+                </button>
                 <button 
                   onClick={() => setShowVideo(true)}
                   className="flex items-center space-x-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all transform hover:scale-105 shadow-sm"
@@ -744,12 +744,12 @@ const LandingPage: React.FC = () => {
               Join Oxford College and become part of the technology revolution
             </p>
             <button 
-                onClick={() => setShowLoginModal(true)}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Aceess ERP Portal</span>
-              </button>
+              onClick={() => navigate('/login')}
+              className="inline-flex items-center space-x-3 px-8 py-4 bg-white text-[#1E3A8A] rounded-2xl hover:bg-blue-50 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold"
+            >
+              <LogIn className="w-5 h-5" />
+              <span>Access ERP Portal</span>
+            </button>
           </motion.div>
         </div>
       </section>

@@ -200,7 +200,7 @@ const LandingPage: React.FC = () => {
                 className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg"
               >
                 <LogIn className="w-4 h-4" />
-                <span>Access ERP Portal</span>
+                <span>Login</span>
               </button>
                 <button 
                   onClick={() => setShowVideo(true)}
