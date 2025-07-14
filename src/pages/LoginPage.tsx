@@ -35,6 +35,13 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form fields
+    if (!formData.identifier.trim() || !formData.password.trim()) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+    
     setIsLoading(true);
     setError('');
 
@@ -231,7 +238,6 @@ const LoginPage: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
                       className="input"
                       placeholder={getPlaceholderText()}
-                      required
                     />
                   </div>
 
@@ -246,7 +252,6 @@ const LoginPage: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       className="input"
                       placeholder="Enter your password"
-                      required
                     />
                   </div>
 

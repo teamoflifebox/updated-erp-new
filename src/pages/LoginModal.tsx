@@ -21,6 +21,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form fields
+    if (!formData.identifier.trim() || !formData.password.trim()) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+    
     setIsLoading(true);
     setError('');
 
@@ -36,14 +43,21 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   };
 
  const demoCredentials = [
-  { role: 'student', identifier: 'CS2023001', name: 'Sridhar' },
-  { role: 'faculty', identifier: 'FAC001', name: 'Ajay' },
-  { role: 'hod', identifier: 'HOD001', name: 'Adbuth Singh' },
-  { role: 'principal', identifier: 'PRI001', name: 'Indhu' },
+  { role: 'student', identifier: 'CS2023001', name: 'Sridhar', dept: 'CS with AI' },
+  { role: 'student', identifier: 'AI2023002', name: 'Sai', dept: 'AI & ML' },
+  { role: 'student', identifier: 'CS2023003', name: 'Santhosh', dept: 'Computer Science' },
+  { role: 'student', identifier: 'ML2023004', name: 'Sandeep', dept: 'ML Engineering' },
+  { role: 'student', identifier: 'DS2023005', name: 'Rajkumar', dept: 'AI & Data Science' },
+  { role: 'faculty', identifier: 'FAC001', name: 'Ajay', dept: 'Computer Science' },
+  { role: 'faculty', identifier: 'FAC002', name: 'Bhanu', dept: 'Cybersecurity' },
+  { role: 'faculty', identifier: 'FAC003', name: 'Chakresh', dept: 'AIML' },
+  { role: 'faculty', identifier: 'FAC004', name: 'Harika', dept: 'Machine Learning' },
+  { role: 'hod', identifier: 'HOD001', name: 'Adbuth Singh', dept: 'Computer Science' },
+  { role: 'principal', identifier: 'PRI001', name: 'Indhu', dept: 'Administration' },
 ];
 
-  const fillDemoCredentials = (identifier: string, role: string) => {
-    setFormData({ ...formData, identifier, role });
+  const fillDemoCredentials = (identifier: string, role: string, password: string = 'password123') => {
+    setFormData({ ...formData, identifier, role, password });
   };
 
   return (
@@ -110,8 +124,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     value={formData.identifier}
                     onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter your jobid"
-                    required
+                    placeholder={formData.role === 'student' ? 'Enter your roll number' : 'Enter your job ID'}
                   />
                 </div>
 
@@ -126,7 +139,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your password"
-                    required
                   />
                   <div className="flex items-center mt-2">
                  <input
@@ -162,17 +174,30 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                   <h3 className="text-sm font-medium text-gray-700 mb-3">
                     Demo Accounts (Password: password123)
                   </h3>
-                  <div className="space-y-2">
-                    {demoCredentials.map((cred) => (
-                      <button
-                        key={cred.role}
-                        onClick={() => fillDemoCredentials(cred.identifier, cred.role)}
-                        className="w-full text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                      >
-                        <span className="font-medium capitalize">{cred.role}:</span> {cred.name}
-                      </button>
-                    ))}
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {demoCredentials
+                      .filter(cred => cred.role === formData.role)
+                      .map((cred) => (
+                        <button
+                          key={`${cred.role}-${cred.identifier}`}
+                          onClick={() => fillDemoCredentials(cred.identifier, cred.role, 'password123')}
+                          className="w-full text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 border border-gray-200 hover:border-gray-300"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="font-medium text-gray-900">{cred.name}</span>
+                              <span className="text-xs text-gray-500 ml-2">({cred.identifier})</span>
+                            </div>
+                            <span className="text-xs text-gray-600">{cred.dept}</span>
+                          </div>
+                        </button>
+                      ))}
                   </div>
+                  {demoCredentials.filter(cred => cred.role === formData.role).length === 0 && (
+                    <p className="text-sm text-gray-500 text-center py-2">
+                      No demo accounts available for this role
+                    </p>
+                  )}
                 </div>
               </div>
 
