@@ -114,6 +114,16 @@ const ProfilePage: React.FC = () => {
           />
         </div>
       )}
+      {user?.role === 'admin' || user?.role === 'hod' || user?.role === 'principal' ? (
+         <div className="fixed top-0 left-0 w-full h-full -z-10">
+          <div className="absolute inset-0 bg-black/20"></div>
+          <img
+            src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80"
+            alt="Administration Background"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      ) : null}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -124,7 +134,7 @@ const ProfilePage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-100">Profile</h1>
-            <p className="text-gray-300">Manage your personal information and settings</p>
+            <p className="text-gray-100">Manage your personal information and settings</p>
           </div>
           {canEdit && (
             <div className="flex space-x-2">

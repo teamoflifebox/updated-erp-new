@@ -10,12 +10,26 @@ import {
   Trash2, 
   Mail, 
   Phone, 
-  User,
   GraduationCap,
   Calendar,
   Award,
   Briefcase
 } from 'lucide-react';
+
+// SVG Star for rating
+const Star = ({ filled }: { filled: boolean }) => (
+  <svg
+    className={`w-4 h-4 ${filled ? 'text-yellow-400' : 'text-gray-300'}`}
+    fill={filled ? 'currentColor' : 'none'}
+    stroke="currentColor"
+    viewBox="0 0 20 20"
+  >
+    <polygon
+      strokeWidth="1"
+      points="10 15 4 18 5.5 11.5 1 7.5 7 7 10 1 13 7 19 7.5 14.5 11.5 16 18"
+    />
+  </svg>
+);
 
 const FacultyManagement: React.FC = () => {
   const { user } = useAuth();
@@ -161,6 +175,8 @@ const FacultyManagement: React.FC = () => {
     });
   };
 
+  const showAdminBg = canManageFaculty || user?.role === 'hod';
+
   if (!canManageFaculty && user?.role !== 'hod') {
     return (
       <Layout>
@@ -176,11 +192,25 @@ const FacultyManagement: React.FC = () => {
 
   return (
     <Layout>
+      {showAdminBg && (
+        <div
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: "url('https://plus.unsplash.com/premium_photo-1683880731591-4fbd49f9ffd5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTd8fHByZXNlbnRhdGlvbnxlbnwwfHwwfHx8MA%3D%3D')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
+          <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px]" />
+        </div>
+      )}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="space-y-6"
+        className="space-y-6 relative z-10"
       >
         <div className="flex justify-between items-center">
           <div>
@@ -199,7 +229,7 @@ const FacultyManagement: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white/80 rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -240,7 +270,7 @@ const FacultyManagement: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-white/70 rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center space-x-4 mb-4">
                 <img
@@ -307,10 +337,8 @@ const FacultyManagement: React.FC = () => {
                   <div className="flex items-center space-x-1">
                     <span className="text-sm font-medium text-gray-900">{faculty.rating}</span>
                     <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className={`w-3 h-3 ${i < Math.floor(faculty.rating) ? 'text-yellow-400' : 'text-gray-300'}`}>
-                          ⭐
-                        </div>
+                      {[1,2,3,4,5].map(i => (
+                        <Star key={i} filled={faculty.rating >= i - 0.25} />
                       ))}
                     </div>
                   </div>
@@ -326,7 +354,7 @@ const FacultyManagement: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4"
+              className="bg-white/90 rounded-xl shadow-xl p-6 w-full max-w-md mx-4"
             >
               <h2 className="text-xl font-bold text-gray-900 mb-4">Add New Faculty</h2>
               

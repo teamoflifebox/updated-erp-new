@@ -61,11 +61,59 @@ const getTypeStyle = (subject: string) => {
   return '';
 };
 
+// ----------------- ADMIN MEETINGS DATA (for principal/admin) -----------------
+const adminMeetings = [
+  {
+    day: 'Mon',
+    time: '10:00 AM',
+    title: 'Staff Meeting',
+    participants: 'All Faculty',
+    location: 'Conference Room 1'
+  },
+  {
+    day: 'Tue',
+    time: '2:00 PM',
+    title: 'Parent-Teacher Meet',
+    participants: 'Parents, Faculty',
+    location: 'Auditorium'
+  },
+  {
+    day: 'Wed',
+    time: '11:15 AM',
+    title: 'Student Council',
+    participants: 'Council Members',
+    location: 'Principal Office'
+  },
+  {
+    day: 'Thu',
+    time: '3:00 PM',
+    title: 'Department Review',
+    participants: 'HODs',
+    location: 'Conference Room 2'
+  },
+  {
+    day: 'Fri',
+    time: '12:15 PM',
+    title: 'Guest Lecture',
+    participants: 'All Students',
+    location: 'Seminar Hall'
+  },
+  {
+    day: 'Sat',
+    time: '9:00 AM',
+    title: 'Campus Inspection',
+    participants: 'Admin Staff',
+    location: 'Campus'
+  }
+];
+
+// ----------------- MAIN COMPONENT -----------------
 const TimetablePage: React.FC = () => {
   const { user } = useAuth();
   const [selectedDay, setSelectedDay] = useState(0);
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
   const isFaculty = user?.role === 'faculty';
+  const isAdmin = user?.role === 'principal' || user?.role === 'admin';
 
   const handlePrint = () => {
     const printContents = document.getElementById('weekly-timetable');
@@ -83,7 +131,95 @@ const TimetablePage: React.FC = () => {
     )
   );
 
-  // Student Views (as before)
+  // ----------------- ADMIN VIEWS -----------------
+  const renderAdminDayView = () => {
+    const dayName = days[selectedDay];
+    const meetings = adminMeetings.filter(m => m.day === dayName);
+    return (
+      <div className={`${colors.cardBg} rounded-lg shadow-sm overflow-hidden border ${colors.cardBorder} backdrop-blur-sm`}>
+        <div className={`p-3 ${colors.timeHeader} font-medium`}>
+          {fullDays[selectedDay]}'s Meetings & Events
+        </div>
+        {meetings.length === 0 ? (
+          <div className="p-6 text-stone-500 italic">No meetings or events scheduled for this day.</div>
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className={colors.inactiveDay}>
+                <th className="p-3 text-left w-24 font-medium">Time</th>
+                <th className="p-3 text-left font-medium">Title</th>
+                <th className="p-3 text-left font-medium">Participants</th>
+                <th className="p-3 text-left w-32 font-medium">Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              {meetings.map((meeting, idx) => (
+                <tr key={meeting.time + idx} className={`border-t ${colors.cardBorder} hover:bg-stone-100`}>
+                  <td className={`p-3 font-medium ${colors.textPrimary}`}>{meeting.time}</td>
+                  <td className={`p-3 ${colors.textPrimary}`}>{meeting.title}</td>
+                  <td className={`p-3 ${colors.textSecondary}`}>{meeting.participants}</td>
+                  <td className={`p-3 ${colors.textSecondary}`}>
+                    {meeting.location && (
+                      <div className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-2 text-stone-500" />
+                        {meeting.location}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    );
+  };
+
+  const renderAdminWeekView = () => (
+    <div id="weekly-timetable" className={`${colors.cardBg} rounded-lg shadow-sm overflow-hidden border ${colors.cardBorder} backdrop-blur-sm`}>
+      <div className={`p-3 ${colors.timeHeader} font-medium`}>
+        Weekly Meetings & Events
+      </div>
+      <table className="w-full">
+        <thead>
+          <tr className={colors.inactiveDay}>
+            {days.map((day, idx) => (
+              <th key={day} className="p-3 text-center font-medium">{fullDays[idx]}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {days.map((day, idx) => {
+              const meetings = adminMeetings.filter(m => m.day === day);
+              return (
+                <td key={day} className="align-top p-2 border-l border-stone-200 min-w-[180px]">
+                  {meetings.length === 0 ? (
+                    <div className="text-stone-400 italic text-sm p-2">No meetings</div>
+                  ) : (
+                    meetings.map((meeting, mIdx) => (
+                      <div key={mIdx} className="mb-2 p-2 bg-stone-100 rounded shadow-sm">
+                        <div className="font-medium text-stone-800 flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-stone-500" /> {meeting.time}
+                        </div>
+                        <div className="text-stone-700">{meeting.title}</div>
+                        <div className="text-xs text-stone-500">{meeting.participants}</div>
+                        <div className="flex items-center text-xs text-stone-500 mt-1">
+                          <MapPin className="w-4 h-4 mr-1" /> {meeting.location}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </td>
+              );
+            })}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+
+  // ----------------- STUDENT & FACULTY VIEWS (UNCHANGED) -----------------
   const renderStudentDayView = () => (
     <div className={`${colors.cardBg} rounded-lg shadow-sm overflow-hidden border ${colors.cardBorder} backdrop-blur-sm`}>
       <div className={`p-3 ${colors.timeHeader} font-medium`}>
@@ -161,7 +297,6 @@ const TimetablePage: React.FC = () => {
     </div>
   );
 
-  // Faculty Views
   const renderFacultyDayView = () => (
     <div className={`${colors.cardBg} rounded-lg shadow-sm overflow-hidden border ${colors.cardBorder} backdrop-blur-sm`}>
       <div className={`p-3 ${colors.timeHeader} font-medium`}>
@@ -238,6 +373,7 @@ const TimetablePage: React.FC = () => {
     </div>
   );
 
+  // ----------------- MAIN RENDER -----------------
   return (
     <Layout>
       {/* Background with subtle overlay */}
@@ -260,10 +396,18 @@ const TimetablePage: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
           <div>
             <h1 className={`text-xl font-semibold ${colors.textPrimary}`}>
-              {isFaculty ? 'Faculty Timetable' : 'Academic Timetable'}
+              {isAdmin
+                ? 'Principal Meeting Schedule'
+                : isFaculty
+                ? 'Faculty Timetable'
+                : 'Academic Timetable'}
             </h1>
             <p className={`${colors.textSecondary} text-sm`}>
-              {viewMode === 'day'
+              {isAdmin
+                ? (viewMode === 'day'
+                    ? fullDays[selectedDay] + " (Meetings & Events)"
+                    : "Weekly Meetings & Events")
+                : viewMode === 'day'
                 ? fullDays[selectedDay] + (isFaculty ? " (Your Classes)" : "")
                 : isFaculty ? 'Weekly Teaching Overview' : 'Weekly Overview'}
             </p>
@@ -295,7 +439,59 @@ const TimetablePage: React.FC = () => {
           </div>
         </div>
 
-        {viewMode === 'day' ? (
+        {isAdmin ? (
+          viewMode === 'day' ? (
+            <>
+              {/* Day selector */}
+              <div className="flex overflow-x-auto pb-2 mb-4 gap-1">
+                {days.map((day, index) => (
+                  <button
+                    key={day}
+                    onClick={() => setSelectedDay(index)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium min-w-[70px] transition-colors ${
+                      selectedDay === index 
+                        ? `${colors.currentDay}` 
+                        : `${colors.inactiveDay}`
+                    }`}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+              {renderAdminDayView()}
+              {/* Day navigation */}
+              <div className="flex justify-between mt-4">
+                <button
+                  onClick={() => setSelectedDay(prev => prev > 0 ? prev - 1 : days.length - 1)}
+                  className={`flex items-center gap-2 px-4 py-2 ${colors.accent} ${colors.textPrimary} rounded-md hover:bg-stone-500`}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous Day
+                </button>
+                <button
+                  onClick={() => setSelectedDay(prev => prev < days.length - 1 ? prev + 1 : 0)}
+                  className={`flex items-center gap-2 px-4 py-2 ${colors.accent} ${colors.textPrimary} rounded-md hover:bg-stone-500`}
+                >
+                  Next Day
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {renderAdminWeekView()}
+              <div className="mt-4 flex justify-end">
+                <button 
+                  onClick={handlePrint}
+                  className={`flex items-center gap-2 px-4 py-2 ${colors.accent} ${colors.textPrimary} rounded-md hover:bg-stone-500`}
+                >
+                  <Printer className="w-4 h-4" />
+                  Print Weekly Meetings
+                </button>
+              </div>
+            </>
+          )
+        ) : viewMode === 'day' ? (
           <>
             {/* Day selector */}
             <div className="flex overflow-x-auto pb-2 mb-4 gap-1">

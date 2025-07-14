@@ -14,8 +14,36 @@ import {
   Download,
   MessageCircle,
   Phone,
-  Printer
+  Printer,
+  PieChart,
+  BarChart2
 } from 'lucide-react';
+
+// Mock analytics for admin dashboard
+const feeAnalytics = {
+  totalCollected: 42000,
+  pending: 12000,
+  overdue: 8000,
+  upcomingDues: 5000,
+  paidPercent: 72,
+  overduePercent: 14,
+  pendingPercent: 14,
+  thisMonth: 15000,
+  lastMonth: 12000,
+  paidBreakdown: [
+    { name: 'Paid', value: 72, color: '#22c55e' },
+    { name: 'Pending', value: 14, color: '#f59e42' },
+    { name: 'Overdue', value: 14, color: '#ef4444' }
+  ],
+  collectionTrend: [
+    { month: 'Jan', collected: 6000 },
+    { month: 'Feb', collected: 7000 },
+    { month: 'Mar', collected: 8000 },
+    { month: 'Apr', collected: 9000 },
+    { month: 'May', collected: 12000 },
+    { month: 'Jun', collected: 15000 },
+  ]
+};
 
 const FeeManagement: React.FC = () => {
   const { user } = useAuth();
@@ -41,7 +69,7 @@ const FeeManagement: React.FC = () => {
     ]
   };
 
-  // Mock data for admin fee management
+  // Mock data for admin fee management (used for export only)
   const mockStudentFees = [
     {
       id: '1',
@@ -153,7 +181,7 @@ const FeeManagement: React.FC = () => {
     setShowPaymentModal(false);
   };
 
-  // --- STUDENT VIEW ---
+  // --- STUDENT VIEW (unchanged) ---
   if (isStudent) {
     return (
       <Layout>
@@ -162,7 +190,7 @@ const FeeManagement: React.FC = () => {
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80')`
+              backgroundImage: `url('https://t4.ftcdn.net/jpg/12/33/91/53/240_F_1233915351_pGZmXeSyFb0cqi7IYEAfYD0KCEBCELGN.jpg')`
             }}
           />
           <div className="absolute inset-0 bg-black/30" />
@@ -422,7 +450,7 @@ const FeeManagement: React.FC = () => {
     );
   }
 
-  // --- ADMIN/PRINCIPAL VIEW (unchanged except for bg-white/90 in containers) ---
+  // --- ADMIN/PRINCIPAL VIEW (analytics dashboard, no student details by default) ---
   if (!canManageFees) {
     return (
       <Layout>
@@ -430,7 +458,7 @@ const FeeManagement: React.FC = () => {
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80')`
+              backgroundImage: `url('https://t4.ftcdn.net/jpg/12/33/91/53/240_F_1233915351_pGZmXeSyFb0cqi7IYEAfYD0KCEBCELGN.jpg')`
             }}
           />
           <div className="absolute inset-0 bg-black/30" />
@@ -451,7 +479,7 @@ const FeeManagement: React.FC = () => {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=1200&q=80')`
+            backgroundImage: `url('https://t4.ftcdn.net/jpg/12/33/91/53/240_F_1233915351_pGZmXeSyFb0cqi7IYEAfYD0KCEBCELGN.jpg')`
           }}
         />
         <div className="absolute inset-0 bg-black/30" />
@@ -459,10 +487,10 @@ const FeeManagement: React.FC = () => {
       <div className="relative z-10 min-h-screen flex flex-col items-center px-2 md:px-0 py-6">
         {/* Header Bar */}
         <div className="w-full max-w-5xl mx-auto mb-8">
-          <div className="bg-white/90 rounded-xl shadow p-6 flex flex-col items-start md:items-center md:flex-row md:justify-between gap-2 md:gap-0">
+          <div className="bg-white/70 rounded-xl shadow p-6 flex flex-col items-start md:items-center md:flex-row md:justify-between gap-2 md:gap-0">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Fee Management</h1>
-              <p className="text-gray-600">Manage all student fee payments and records</p>
+              <p className="text-gray-700">Analytics and summary of all student fee payments</p>
             </div>
             <div className="flex space-x-2 mt-2 md:mt-0">
               <button
@@ -482,7 +510,137 @@ const FeeManagement: React.FC = () => {
             </div>
           </div>
         </div>
-        {/* ...rest of your admin/principal content... */}
+
+        {/* Analytics Summary Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-5xl mx-auto space-y-8"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white/70 rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Collected</p>
+                  <p className="text-2xl font-bold text-green-600">${feeAnalytics.totalCollected.toLocaleString()}</p>
+                </div>
+                <div className="bg-green-100 p-3 rounded-xl">
+                  <DollarSign className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+              <span className="text-xs text-gray-400">This Month: ${feeAnalytics.thisMonth.toLocaleString()}</span>
+            </div>
+            <div className="bg-white/70 rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Pending</p>
+                  <p className="text-2xl font-bold text-yellow-600">${feeAnalytics.pending.toLocaleString()}</p>
+                </div>
+                <div className="bg-yellow-100 p-3 rounded-xl">
+                  <Clock className="w-6 h-6 text-yellow-600" />
+                </div>
+              </div>
+              <span className="text-xs text-gray-400">Upcoming Dues: ${feeAnalytics.upcomingDues.toLocaleString()}</span>
+            </div>
+            <div className="bg-white/70 rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Overdue</p>
+                  <p className="text-2xl font-bold text-red-600">${feeAnalytics.overdue.toLocaleString()}</p>
+                </div>
+                <div className="bg-red-100 p-3 rounded-xl">
+                  <AlertCircle className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
+              <span className="text-xs text-gray-400">Overdue %: {feeAnalytics.overduePercent}%</span>
+            </div>
+            <div className="bg-white/70 rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Paid %</p>
+                  <p className="text-2xl font-bold text-blue-600">{feeAnalytics.paidPercent}%</p>
+                </div>
+                <div className="bg-blue-100 p-3 rounded-xl">
+                  <CheckCircle className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+              <span className="text-xs text-gray-400">Pending %: {feeAnalytics.pendingPercent}%</span>
+            </div>
+          </div>
+
+          {/* Charts */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white/60 rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <BarChart2 className="w-5 h-5 text-blue-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Fee Collection Trend</h3>
+              </div>
+              <div className="h-48 flex items-end gap-2">
+                {feeAnalytics.collectionTrend.map((item, idx) => (
+                  <div key={item.month} className="flex-1 flex flex-col items-center">
+                    <div
+                      className="w-8 rounded-t bg-blue-500 transition-all"
+                      style={{
+                        height: `${item.collected / 200}px`, // scale for demo
+                        minHeight: '10px'
+                      }}
+                    ></div>
+                    <span className="text-xs text-gray-500 mt-1">{item.month}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-2">
+                <span>Last Month: ${feeAnalytics.lastMonth.toLocaleString()}</span>
+                <span>This Month: ${feeAnalytics.thisMonth.toLocaleString()}</span>
+              </div>
+            </div>
+            <div className="bg-white/70 rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <PieChart className="w-5 h-5 text-green-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Paid vs Pending vs Overdue</h3>
+              </div>
+              <div className="flex items-center justify-center h-48">
+                <svg width="120" height="120" viewBox="0 0 36 36">
+                  {(() => {
+                    let acc = 0;
+                    return feeAnalytics.paidBreakdown.map((slice, idx) => {
+                      const val = slice.value / 100 * 100;
+                      const dash = `${val} ${100 - val}`;
+                      const el = (
+                        <circle
+                          key={slice.name}
+                          r="16"
+                          cx="18"
+                          cy="18"
+                          fill="transparent"
+                          stroke={slice.color}
+                          strokeWidth="6"
+                          strokeDasharray={dash}
+                          strokeDashoffset={-acc}
+                        />
+                      );
+                      acc -= val;
+                      return el;
+                    });
+                  })()}
+                </svg>
+                <div className="absolute text-center">
+                  <span className="text-xl font-bold text-gray-900">{feeAnalytics.paidPercent}%</span>
+                  <div className="text-xs text-gray-500">Paid</div>
+                </div>
+              </div>
+              <div className="flex justify-center gap-4 mt-2 text-xs">
+                {feeAnalytics.paidBreakdown.map(slice => (
+                  <div key={slice.name} className="flex items-center gap-1">
+                    <span className="inline-block w-3 h-3 rounded-full" style={{ background: slice.color }}></span>
+                    <span>{slice.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </Layout>
   );

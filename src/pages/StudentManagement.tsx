@@ -212,13 +212,30 @@ const StudentManagement: React.FC = () => {
     );
   }
 
+  // Only show background for admin/HOD/principal/director
+  const showAdminBg = canManageStudents;
+
   return (
     <Layout>
+      {showAdminBg && (
+        <div
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1557734864-c78b6dfef1b1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjR8fHNjaG9vbCUyMG1hbmFnZW1lbnR8ZW58MHx8MHx8fDA%3D')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
+          <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px]" />
+        </div>
+      )}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="space-y-6"
+        className={`space-y-6 relative z-10`}
       >
         <div className="flex justify-between items-center">
           <div>
@@ -235,7 +252,7 @@ const StudentManagement: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white/80 rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -276,7 +293,7 @@ const StudentManagement: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-white/70 rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center space-x-4 mb-4">
                 <img
@@ -344,7 +361,7 @@ const StudentManagement: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4"
+              className="bg-white/90 rounded-xl shadow-xl p-6 w-full max-w-md mx-4"
             >
               <h2 className="text-xl font-bold text-gray-900 mb-4">Add New Student</h2>
               

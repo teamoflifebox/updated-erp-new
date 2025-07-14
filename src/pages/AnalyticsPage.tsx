@@ -26,7 +26,6 @@ import {
   GraduationCap, 
   Award, 
   Calendar,
-  Filter,
   Download,
   Printer
 } from 'lucide-react';
@@ -34,7 +33,6 @@ import {
 const AnalyticsPage: React.FC = () => {
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState('semester');
-  const [selectedDepartment, setSelectedDepartment] = useState('all');
 
   const canViewAnalytics = ['hod', 'principal', 'director'].includes(user?.role || '');
 
@@ -132,22 +130,39 @@ const AnalyticsPage: React.FC = () => {
 
   return (
     <Layout>
+      {/* Full-page background image and overlay */}
+      <div
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1543286386-713bdd548da4?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTF8fGFuYWx5dGljc3xlbnwwfHwwfHx8MA%3D%3D')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          minHeight: '100vh',
+          width: '100vw'
+        }}
+      >
+        <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px]" />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="space-y-6"
+        className="space-y-8 relative z-10"
       >
-        <div className="flex justify-between items-center">
+        {/* Header (no white bar, just text) */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-1">Analytics Dashboard</h1>
+            <div className="h-1 w-16 bg-blue-500 rounded mb-2" />
             <p className="text-gray-600">Comprehensive insights and performance metrics</p>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex flex-wrap gap-2">
             <select
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-200 bg-white/80 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-transparent"
             >
               <option value="semester">This Semester</option>
               <option value="year">This Year</option>
@@ -155,14 +170,14 @@ const AnalyticsPage: React.FC = () => {
             </select>
             <button 
               onClick={handleExportPDF}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 border border-gray-200 bg-white/80 text-gray-700 rounded-lg hover:bg-blue-50 transition-colors"
             >
               <Download className="w-4 h-4" />
               <span>Export PDF</span>
             </button>
             <button 
               onClick={handlePrint}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 border border-gray-200 bg-white/80 text-gray-700 rounded-lg hover:bg-blue-50 transition-colors"
             >
               <Printer className="w-4 h-4" />
               <span>Print</span>
@@ -170,15 +185,15 @@ const AnalyticsPage: React.FC = () => {
           </div>
         </div>
 
-        <div id="analytics-content">
+        <div id="analytics-content" className="space-y-8">
           {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Students</p>
+                  <p className="text-xs font-medium text-gray-500">Total Students</p>
                   <p className="text-3xl font-bold text-gray-900">2,847</p>
-                  <p className="text-sm text-green-600 mt-1">↗ 3.5% from last year</p>
+                  <p className="text-xs text-green-600 mt-1">↗ 3.5% from last year</p>
                 </div>
                 <div className="bg-blue-100 p-3 rounded-xl">
                   <GraduationCap className="w-6 h-6 text-blue-600" />
@@ -186,12 +201,12 @@ const AnalyticsPage: React.FC = () => {
               </div>
             </div>
             
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Faculty Members</p>
+                  <p className="text-xs font-medium text-gray-500">Faculty Members</p>
                   <p className="text-3xl font-bold text-gray-900">156</p>
-                  <p className="text-sm text-green-600 mt-1">↗ 0.6% from last year</p>
+                  <p className="text-xs text-green-600 mt-1">↗ 0.6% from last year</p>
                 </div>
                 <div className="bg-green-100 p-3 rounded-xl">
                   <Users className="w-6 h-6 text-green-600" />
@@ -199,12 +214,12 @@ const AnalyticsPage: React.FC = () => {
               </div>
             </div>
             
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Avg Attendance</p>
+                  <p className="text-xs font-medium text-gray-500">Avg Attendance</p>
                   <p className="text-3xl font-bold text-gray-900">88.5%</p>
-                  <p className="text-sm text-green-600 mt-1">↗ 2.1% from last month</p>
+                  <p className="text-xs text-green-600 mt-1">↗ 2.1% from last month</p>
                 </div>
                 <div className="bg-yellow-100 p-3 rounded-xl">
                   <Calendar className="w-6 h-6 text-yellow-600" />
@@ -212,12 +227,12 @@ const AnalyticsPage: React.FC = () => {
               </div>
             </div>
             
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Placement Rate</p>
+                  <p className="text-xs font-medium text-gray-500">Placement Rate</p>
                   <p className="text-3xl font-bold text-gray-900">87%</p>
-                  <p className="text-sm text-green-600 mt-1">↗ 3% from last year</p>
+                  <p className="text-xs text-green-600 mt-1">↗ 3% from last year</p>
                 </div>
                 <div className="bg-purple-100 p-3 rounded-xl">
                   <Award className="w-6 h-6 text-purple-600" />
@@ -229,7 +244,7 @@ const AnalyticsPage: React.FC = () => {
           {/* Charts Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Enrollment Trends */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Enrollment Trends</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -238,15 +253,15 @@ const AnalyticsPage: React.FC = () => {
                     <XAxis dataKey="year" />
                     <YAxis />
                     <Tooltip />
-                    <Area type="monotone" dataKey="students" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
-                    <Area type="monotone" dataKey="faculty" stackId="2" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
+                    <Area type="monotone" dataKey="students" stackId="1" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.5} />
+                    <Area type="monotone" dataKey="faculty" stackId="2" stroke="#10b981" fill="#10b981" fillOpacity={0.5} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
             {/* Department Distribution */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Department Distribution</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -272,7 +287,7 @@ const AnalyticsPage: React.FC = () => {
             </div>
 
             {/* Academic Performance */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Academic Performance</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -290,7 +305,7 @@ const AnalyticsPage: React.FC = () => {
             </div>
 
             {/* Attendance Trends */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Attendance</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -309,7 +324,7 @@ const AnalyticsPage: React.FC = () => {
           {/* Placement and Fee Collection */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Placement Statistics */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Placement Statistics</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -326,7 +341,7 @@ const AnalyticsPage: React.FC = () => {
             </div>
 
             {/* Fee Collection */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow border border-gray-100 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Fee Collection vs Target</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -344,7 +359,7 @@ const AnalyticsPage: React.FC = () => {
           </div>
 
           {/* Department Performance Table */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white/90 rounded-2xl shadow border border-gray-100 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Department Performance Summary</h3>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -385,34 +400,34 @@ const AnalyticsPage: React.FC = () => {
           </div>
 
           {/* Insights and Recommendations */}
-          <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-primary-900 mb-4 flex items-center space-x-2">
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-6">
+            <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center space-x-2">
               <TrendingUp className="w-5 h-5" />
               <span>Key Insights & Recommendations</span>
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-lg p-4">
+              <div className="bg-white/80 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-2">Enrollment Growth</h4>
                 <p className="text-sm text-gray-600">
                   Student enrollment has grown by 29% over the past 5 years. Consider expanding infrastructure 
                   and faculty to maintain quality education standards.
                 </p>
               </div>
-              <div className="bg-white rounded-lg p-4">
+              <div className="bg-white/80 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-2">Attendance Improvement</h4>
                 <p className="text-sm text-gray-600">
                   Overall attendance has improved to 88.5%. Focus on departments with lower attendance rates 
                   through targeted interventions and engagement programs.
                 </p>
               </div>
-              <div className="bg-white rounded-lg p-4">
+              <div className="bg-white/80 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-2">Placement Success</h4>
                 <p className="text-sm text-gray-600">
                   Placement rate of 87% is excellent. Strengthen industry partnerships and skill development 
                   programs to maintain this performance.
                 </p>
               </div>
-              <div className="bg-white rounded-lg p-4">
+              <div className="bg-white/80 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-2">Fee Collection</h4>
                 <p className="text-sm text-gray-600">
                   Fee collection efficiency is at 94%. Implement automated reminders and flexible payment 
