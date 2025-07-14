@@ -2,24 +2,20 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout/Layout';
-import { 
-  Settings, 
-  User, 
-  Bell, 
-  Shield, 
-  Palette, 
-  Globe, 
+import {
+  User,
+  Bell,
+  Shield,
+  Palette,
+  Lock,
   Smartphone,
   Mail,
-  Lock,
   Eye,
   EyeOff,
-  Save,
-  RefreshCw
 } from 'lucide-react';
 
 const SettingsPage: React.FC = () => {
-  const { user, updateProfile } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [showPassword, setShowPassword] = useState(false);
   const [settings, setSettings] = useState({
@@ -28,7 +24,7 @@ const SettingsPage: React.FC = () => {
       email: user?.email || '',
       phone: user?.phone || '',
       language: 'en',
-      timezone: 'UTC+05:30'
+      timezone: 'UTC+05:30',
     },
     notifications: {
       emailNotifications: true,
@@ -37,25 +33,25 @@ const SettingsPage: React.FC = () => {
       attendanceAlerts: true,
       feeReminders: true,
       marksUpdates: true,
-      generalAnnouncements: true
+      generalAnnouncements: true,
     },
     security: {
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
       twoFactorAuth: false,
-      loginAlerts: true
+      loginAlerts: true,
     },
     appearance: {
       theme: 'light',
       fontSize: 'medium',
-      colorScheme: 'blue'
+      colorScheme: 'blue',
     },
     privacy: {
       profileVisibility: 'institution',
       contactInfoVisible: true,
-      academicInfoVisible: true
-    }
+      academicInfoVisible: true,
+    },
   });
 
   const tabs = [
@@ -63,19 +59,10 @@ const SettingsPage: React.FC = () => {
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'appearance', label: 'Appearance', icon: Palette },
-    { id: 'privacy', label: 'Privacy', icon: Lock }
+    { id: 'privacy', label: 'Privacy', icon: Lock },
   ];
 
-  const handleSave = (section: string) => {
-    console.log(`Saving ${section} settings:`, settings[section]);
-    
-    if (section === 'profile') {
-      updateProfile(settings.profile);
-    }
-    
-    alert(`${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully!`);
-  };
-
+  // --- RENDER FUNCTIONS (unchanged) ---
   const renderProfileSettings = () => (
     <div className="space-y-6">
       <div>
@@ -86,48 +73,53 @@ const SettingsPage: React.FC = () => {
             <input
               type="text"
               value={settings.profile.name}
-              onChange={(e) => setSettings({
-                ...settings,
-                profile: { ...settings.profile, name: e.target.value }
-              })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  profile: { ...settings.profile, name: e.target.value },
+                })
+              }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
             <input
               type="email"
               value={settings.profile.email}
-              onChange={(e) => setSettings({
-                ...settings,
-                profile: { ...settings.profile, email: e.target.value }
-              })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  profile: { ...settings.profile, email: e.target.value },
+                })
+              }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
             <input
               type="tel"
               value={settings.profile.phone}
-              onChange={(e) => setSettings({
-                ...settings,
-                profile: { ...settings.profile, phone: e.target.value }
-              })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  profile: { ...settings.profile, phone: e.target.value },
+                })
+              }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
-          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
             <select
               value={settings.profile.language}
-              onChange={(e) => setSettings({
-                ...settings,
-                profile: { ...settings.profile, language: e.target.value }
-              })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  profile: { ...settings.profile, language: e.target.value },
+                })
+              }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="en">English</option>
@@ -136,15 +128,16 @@ const SettingsPage: React.FC = () => {
               <option value="ta">Tamil</option>
             </select>
           </div>
-          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
             <select
               value={settings.profile.timezone}
-              onChange={(e) => setSettings({
-                ...settings,
-                profile: { ...settings.profile, timezone: e.target.value }
-              })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  profile: { ...settings.profile, timezone: e.target.value },
+                })
+              }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="UTC+05:30">India Standard Time (UTC+05:30)</option>
@@ -154,16 +147,6 @@ const SettingsPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      <div className="flex justify-end">
-        <button
-          onClick={() => handleSave('profile')}
-          className="flex items-center space-x-2 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Save className="w-4 h-4" />
-          <span>Save Changes</span>
-        </button>
-      </div>
     </div>
   );
 
@@ -171,7 +154,6 @@ const SettingsPage: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h3>
-        
         <div className="space-y-4">
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="font-medium text-gray-900 mb-3">Communication Channels</h4>
@@ -179,7 +161,7 @@ const SettingsPage: React.FC = () => {
               {[
                 { key: 'emailNotifications', label: 'Email Notifications', icon: Mail },
                 { key: 'smsNotifications', label: 'SMS Notifications', icon: Smartphone },
-                { key: 'whatsappNotifications', label: 'WhatsApp Notifications', icon: Smartphone }
+                { key: 'whatsappNotifications', label: 'WhatsApp Notifications', icon: Smartphone },
               ].map((item) => (
                 <div key={item.key} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -190,10 +172,12 @@ const SettingsPage: React.FC = () => {
                     <input
                       type="checkbox"
                       checked={settings.notifications[item.key]}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        notifications: { ...settings.notifications, [item.key]: e.target.checked }
-                      })}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          notifications: { ...settings.notifications, [item.key]: e.target.checked },
+                        })
+                      }
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
@@ -202,7 +186,6 @@ const SettingsPage: React.FC = () => {
               ))}
             </div>
           </div>
-          
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="font-medium text-gray-900 mb-3">Notification Types</h4>
             <div className="space-y-3">
@@ -210,7 +193,7 @@ const SettingsPage: React.FC = () => {
                 { key: 'attendanceAlerts', label: 'Attendance Alerts' },
                 { key: 'feeReminders', label: 'Fee Reminders' },
                 { key: 'marksUpdates', label: 'Marks Updates' },
-                { key: 'generalAnnouncements', label: 'General Announcements' }
+                { key: 'generalAnnouncements', label: 'General Announcements' },
               ].map((item) => (
                 <div key={item.key} className="flex items-center justify-between">
                   <span className="text-gray-700">{item.label}</span>
@@ -218,10 +201,12 @@ const SettingsPage: React.FC = () => {
                     <input
                       type="checkbox"
                       checked={settings.notifications[item.key]}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        notifications: { ...settings.notifications, [item.key]: e.target.checked }
-                      })}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          notifications: { ...settings.notifications, [item.key]: e.target.checked },
+                        })
+                      }
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
@@ -232,16 +217,6 @@ const SettingsPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      <div className="flex justify-end">
-        <button
-          onClick={() => handleSave('notifications')}
-          className="flex items-center space-x-2 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Save className="w-4 h-4" />
-          <span>Save Changes</span>
-        </button>
-      </div>
     </div>
   );
 
@@ -249,7 +224,6 @@ const SettingsPage: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Security Settings</h3>
-        
         <div className="space-y-6">
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="font-medium text-gray-900 mb-3">Change Password</h4>
@@ -260,10 +234,12 @@ const SettingsPage: React.FC = () => {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={settings.security.currentPassword}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      security: { ...settings.security, currentPassword: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        security: { ...settings.security, currentPassword: e.target.value },
+                      })
+                    }
                     className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />
                   <button
@@ -271,45 +247,58 @@ const SettingsPage: React.FC = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4 text-gray-400" /> : <Eye className="w-4 h-4 text-gray-400" />}
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4 text-gray-400" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-gray-400" />
+                    )}
                   </button>
                 </div>
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
                 <input
                   type="password"
                   value={settings.security.newPassword}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    security: { ...settings.security, newPassword: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      security: { ...settings.security, newPassword: e.target.value },
+                    })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
-              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
                 <input
                   type="password"
                   value={settings.security.confirmPassword}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    security: { ...settings.security, confirmPassword: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      security: { ...settings.security, confirmPassword: e.target.value },
+                    })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
           </div>
-          
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="font-medium text-gray-900 mb-3">Security Options</h4>
             <div className="space-y-3">
               {[
-                { key: 'twoFactorAuth', label: 'Two-Factor Authentication', description: 'Add an extra layer of security to your account' },
-                { key: 'loginAlerts', label: 'Login Alerts', description: 'Get notified when someone logs into your account' }
+                {
+                  key: 'twoFactorAuth',
+                  label: 'Two-Factor Authentication',
+                  description: 'Add an extra layer of security to your account',
+                },
+                {
+                  key: 'loginAlerts',
+                  label: 'Login Alerts',
+                  description: 'Get notified when someone logs into your account',
+                },
               ].map((item) => (
                 <div key={item.key} className="flex items-start justify-between">
                   <div className="flex-1">
@@ -320,10 +309,12 @@ const SettingsPage: React.FC = () => {
                     <input
                       type="checkbox"
                       checked={settings.security[item.key]}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        security: { ...settings.security, [item.key]: e.target.checked }
-                      })}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          security: { ...settings.security, [item.key]: e.target.checked },
+                        })
+                      }
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
@@ -334,16 +325,6 @@ const SettingsPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      <div className="flex justify-end">
-        <button
-          onClick={() => handleSave('security')}
-          className="flex items-center space-x-2 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Save className="w-4 h-4" />
-          <span>Save Changes</span>
-        </button>
-      </div>
     </div>
   );
 
@@ -351,7 +332,6 @@ const SettingsPage: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Appearance Settings</h3>
-        
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Theme</label>
@@ -359,7 +339,7 @@ const SettingsPage: React.FC = () => {
               {[
                 { value: 'light', label: 'Light', preview: 'bg-white border-2' },
                 { value: 'dark', label: 'Dark', preview: 'bg-gray-900 border-2' },
-                { value: 'auto', label: 'Auto', preview: 'bg-gradient-to-r from-white to-gray-900 border-2' }
+                { value: 'auto', label: 'Auto', preview: 'bg-gradient-to-r from-white to-gray-900 border-2' },
               ].map((theme) => (
                 <label key={theme.value} className="cursor-pointer">
                   <input
@@ -367,17 +347,21 @@ const SettingsPage: React.FC = () => {
                     name="theme"
                     value={theme.value}
                     checked={settings.appearance.theme === theme.value}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      appearance: { ...settings.appearance, theme: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        appearance: { ...settings.appearance, theme: e.target.value },
+                      })
+                    }
                     className="sr-only"
                   />
-                  <div className={`p-4 rounded-lg border-2 transition-colors ${
-                    settings.appearance.theme === theme.value 
-                      ? 'border-primary-500 bg-primary-50' 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}>
+                  <div
+                    className={`p-4 rounded-lg border-2 transition-colors ${
+                      settings.appearance.theme === theme.value
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
                     <div className={`w-full h-16 rounded ${theme.preview} mb-2`}></div>
                     <div className="text-center text-sm font-medium">{theme.label}</div>
                   </div>
@@ -385,15 +369,16 @@ const SettingsPage: React.FC = () => {
               ))}
             </div>
           </div>
-          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Font Size</label>
             <select
               value={settings.appearance.fontSize}
-              onChange={(e) => setSettings({
-                ...settings,
-                appearance: { ...settings.appearance, fontSize: e.target.value }
-              })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  appearance: { ...settings.appearance, fontSize: e.target.value },
+                })
+              }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="small">Small</option>
@@ -401,7 +386,6 @@ const SettingsPage: React.FC = () => {
               <option value="large">Large</option>
             </select>
           </div>
-          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Color Scheme</label>
             <div className="grid grid-cols-4 gap-3">
@@ -409,7 +393,7 @@ const SettingsPage: React.FC = () => {
                 { value: 'blue', color: 'bg-blue-500' },
                 { value: 'green', color: 'bg-green-500' },
                 { value: 'purple', color: 'bg-purple-500' },
-                { value: 'red', color: 'bg-red-500' }
+                { value: 'red', color: 'bg-red-500' },
               ].map((scheme) => (
                 <label key={scheme.value} className="cursor-pointer">
                   <input
@@ -417,32 +401,26 @@ const SettingsPage: React.FC = () => {
                     name="colorScheme"
                     value={scheme.value}
                     checked={settings.appearance.colorScheme === scheme.value}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      appearance: { ...settings.appearance, colorScheme: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        appearance: { ...settings.appearance, colorScheme: e.target.value },
+                      })
+                    }
                     className="sr-only"
                   />
-                  <div className={`w-12 h-12 rounded-lg ${scheme.color} border-4 transition-all ${
-                    settings.appearance.colorScheme === scheme.value 
-                      ? 'border-gray-900 scale-110' 
-                      : 'border-gray-200'
-                  }`}></div>
+                  <div
+                    className={`w-12 h-12 rounded-lg ${scheme.color} border-4 transition-all ${
+                      settings.appearance.colorScheme === scheme.value
+                        ? 'border-gray-900 scale-110'
+                        : 'border-gray-200'
+                    }`}
+                  ></div>
                 </label>
               ))}
             </div>
           </div>
         </div>
-      </div>
-      
-      <div className="flex justify-end">
-        <button
-          onClick={() => handleSave('appearance')}
-          className="flex items-center space-x-2 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Save className="w-4 h-4" />
-          <span>Save Changes</span>
-        </button>
       </div>
     </div>
   );
@@ -451,16 +429,17 @@ const SettingsPage: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Privacy Settings</h3>
-        
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Profile Visibility</label>
             <select
               value={settings.privacy.profileVisibility}
-              onChange={(e) => setSettings({
-                ...settings,
-                privacy: { ...settings.privacy, profileVisibility: e.target.value }
-              })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  privacy: { ...settings.privacy, profileVisibility: e.target.value },
+                })
+              }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="public">Public</option>
@@ -468,11 +447,10 @@ const SettingsPage: React.FC = () => {
               <option value="private">Private</option>
             </select>
           </div>
-          
           <div className="space-y-3">
             {[
               { key: 'contactInfoVisible', label: 'Contact Information Visible' },
-              { key: 'academicInfoVisible', label: 'Academic Information Visible' }
+              { key: 'academicInfoVisible', label: 'Academic Information Visible' },
             ].map((item) => (
               <div key={item.key} className="flex items-center justify-between">
                 <span className="text-gray-700">{item.label}</span>
@@ -480,10 +458,12 @@ const SettingsPage: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={settings.privacy[item.key]}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      privacy: { ...settings.privacy, [item.key]: e.target.checked }
-                    })}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        privacy: { ...settings.privacy, [item.key]: e.target.checked },
+                      })
+                    }
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
@@ -493,47 +473,65 @@ const SettingsPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      <div className="flex justify-end">
-        <button
-          onClick={() => handleSave('privacy')}
-          className="flex items-center space-x-2 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Save className="w-4 h-4" />
-          <span>Save Changes</span>
-        </button>
-      </div>
     </div>
   );
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'profile': return renderProfileSettings();
-      case 'notifications': return renderNotificationSettings();
-      case 'security': return renderSecuritySettings();
-      case 'appearance': return renderAppearanceSettings();
-      case 'privacy': return renderPrivacySettings();
-      default: return renderProfileSettings();
+      case 'profile':
+        return renderProfileSettings();
+      case 'notifications':
+        return renderNotificationSettings();
+      case 'security':
+        return renderSecuritySettings();
+      case 'appearance':
+        return renderAppearanceSettings();
+      case 'privacy':
+        return renderPrivacySettings();
+      default:
+        return renderProfileSettings();
     }
+  };
+
+  // Handler for Save Changes (for faculty only)
+  const handleSaveChanges = () => {
+    // Add your save logic here
+    alert('Settings saved successfully!');
   };
 
   return (
     <Layout>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="space-y-6"
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="fixed top-0 left-0 w-full h-full object-cover z-0"
+        style={{ pointerEvents: 'none' }}
       >
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600">Manage your account settings and preferences</p>
+        <source src="https://media.istockphoto.com/id/1224356307/video/circuit-board-background-copy-space-blue-loopable-animation-computer-data-technology.mp4?s=mp4-640x640-is&k=20&c=G0mWgOSm7QrXr2bceDPdVBwbFUKcI7rFJKm-FIlJI2I=" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div className="relative z-10 min-h-screen flex flex-col items-center px-2 md:px-0 py-6">
+        {/* Header Bar */}
+        <div className="w-full max-w-5xl mx-auto mb-8">
+          <div className="bg-white/90 rounded-xl shadow p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-0">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+              <p className="text-gray-600">Manage your account settings and preferences</p>
+            </div>
+          </div>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-5xl mx-auto flex flex-col lg:flex-row gap-8"
+        >
           {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="lg:w-1/4 w-full">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-8 lg:mb-0">
               <nav className="space-y-2">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
@@ -555,15 +553,25 @@ const SettingsPage: React.FC = () => {
               </nav>
             </div>
           </div>
-
           {/* Main Content */}
-          <div className="lg:col-span-3">
+          <div className="lg:w-3/4 w-full">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               {renderTabContent()}
+              {/* Save Changes button only for faculty */}
+              {user?.role === 'faculty' && (
+                <div className="pt-8 flex justify-end">
+                  <button
+                    onClick={handleSaveChanges}
+                    className="px-6 py-2 bg-primary-600 text-white rounded-lg font-semibold shadow hover:bg-primary-700 transition"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </Layout>
   );
 };

@@ -2,204 +2,231 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout/Layout';
-import { pdfExportService } from '../utils/pdfExport';
-import { Calendar, Clock, MapPin, User, BookOpen, Filter, Download, Printer, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, MapPin, Printer, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const fullDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const timeSlots = [
+  '9:00 AM', '10:00 AM', '11:15 AM', '12:15 PM',
+  '2:00 PM', '3:00 PM', '4:15 PM', '5:15 PM'
+];
+
+const colors = {
+  lecture: 'bg-stone-50 border-stone-200',
+  lab: 'bg-stone-50 border-stone-200',
+  break: 'bg-stone-100 border-stone-300',
+  free: 'bg-stone-50 border-stone-200',
+  currentDay: 'bg-stone-400 text-stone-800',
+  inactiveDay: 'bg-stone-200 text-stone-700 hover:bg-stone-300',
+  timeHeader: 'bg-stone-300 text-stone-800',
+  cardBg: 'bg-stone-50/90',
+  cardBorder: 'border-stone-200',
+  textPrimary: 'text-stone-800',
+  textSecondary: 'text-stone-600',
+  accent: 'bg-stone-400'
+};
+
+// Example: Faculty teaches Data Structures to CS-301 and Algorithms to CS-302
+const facultyAssignments = [
+  { day: 'Mon', slot: 0, subject: 'Data Structures', section: 'CS-301', room: 'A-101' },
+  { day: 'Mon', slot: 4, subject: 'Data Structures', section: 'CS-301', room: 'A-101' },
+  { day: 'Tue', slot: 1, subject: 'Algorithms', section: 'CS-302', room: 'B-201' },
+  { day: 'Thu', slot: 6, subject: 'Algorithms', section: 'CS-302', room: 'B-201' },
+  { day: 'Fri', slot: 2, subject: 'Data Structures', section: 'CS-301', room: 'A-101' },
+  // ...add more as needed
+];
+
+// For students, reuse your original data:
+const timetableData = {
+  Mon: ['Data Structures', 'Mathematics', 'DS Lab', 'Lunch Break', 'Database Systems', 'Software Eng', 'Free', 'Study Hall'],
+  Tue: ['Algorithms', 'Computer Networks', 'DB Lab', 'Lunch Break', 'Operating Systems', 'Web Dev', 'Project', 'Free'],
+  Wed: ['Discrete Math', 'Comp Architecture', 'OS Lab', 'Lunch Break', 'AI Fundamentals', 'Elective', 'Tutorial', 'Free'],
+  Thu: ['Theory of Comp', 'Data Structures', 'AI Lab', 'Lunch Break', 'Software Eng', 'Seminar', 'Free', 'Study Hall'],
+  Fri: ['Mathematics', 'Database Systems', 'Web Lab', 'Lunch Break', 'Computer Networks', 'Workshop', 'Free', 'Meeting'],
+  Sat: ['Special Topic', 'Project Work', 'Project Work', 'Lunch Break', 'Elective', 'Sports', 'Free', 'Free']
+};
+
+const roomData = {
+  Mon: ['A-101', 'B-201', 'Lab-1', '', 'A-102', 'B-202', '', 'Library'],
+  Tue: ['A-103', 'B-203', 'Lab-2', '', 'A-104', 'Lab-3', 'A-101', ''],
+  Wed: ['C-101', 'B-204', 'Lab-4', '', 'A-105', 'Varies', 'Library', ''],
+  Thu: ['D-101', 'A-101', 'Lab-5', '', 'B-202', 'Auditorium', '', 'Library'],
+  Fri: ['B-201', 'A-102', 'Lab-3', '', 'B-203', 'Seminar Hall', '', 'Offices'],
+  Sat: ['A-106', 'Project Lab', 'Project Lab', '', 'Varies', 'Sports Complex', '', '']
+};
+
+const getTypeStyle = (subject: string) => {
+  if (subject.includes('Lab')) return 'border-l-4 border-stone-400';
+  if (subject.includes('Break')) return 'italic text-stone-500';
+  return '';
+};
 
 const TimetablePage: React.FC = () => {
   const { user } = useAuth();
-  const [selectedWeek, setSelectedWeek] = useState(0);
-  const [selectedView, setSelectedView] = useState<'week' | 'day'>('week');
   const [selectedDay, setSelectedDay] = useState(0);
-
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const timeSlots = [
-    '9:00 AM - 10:00 AM',
-    '10:00 AM - 11:00 AM',
-    '11:15 AM - 12:15 PM',
-    '12:15 PM - 1:15 PM',
-    '2:00 PM - 3:00 PM',
-    '3:00 PM - 4:00 PM',
-    '4:15 PM - 5:15 PM',
-    '5:15 PM - 6:15 PM'
-  ];
-
-  // Mock timetable data based on user role
-  const getTimetableData = () => {
-    if (user?.role === 'student') {
-      return {
-        Monday: [
-          { time: '9:00 AM - 10:00 AM', subject: 'Data Structures', faculty: 'Dr. Smith', room: 'A-101', type: 'lecture' },
-          { time: '10:00 AM - 11:00 AM', subject: 'Mathematics', faculty: 'Prof. Johnson', room: 'B-201', type: 'lecture' },
-          { time: '11:15 AM - 12:15 PM', subject: 'Data Structures Lab', faculty: 'Dr. Smith', room: 'Lab-1', type: 'lab' },
-          { time: '12:15 PM - 1:15 PM', subject: 'Lunch Break', faculty: '', room: '', type: 'break' },
-          { time: '2:00 PM - 3:00 PM', subject: 'Database Systems', faculty: 'Dr. Brown', room: 'A-102', type: 'lecture' },
-          { time: '3:00 PM - 4:00 PM', subject: 'Software Engineering', faculty: 'Prof. Davis', room: 'B-202', type: 'lecture' },
-          { time: '4:15 PM - 5:15 PM', subject: 'Free Period', faculty: '', room: '', type: 'free' },
-          { time: '5:15 PM - 6:15 PM', subject: 'Study Hall', faculty: '', room: 'Library', type: 'study' }
-        ],
-        Tuesday: [
-          { time: '9:00 AM - 10:00 AM', subject: 'Algorithms', faculty: 'Dr. Wilson', room: 'A-103', type: 'lecture' },
-          { time: '10:00 AM - 11:00 AM', subject: 'Computer Networks', faculty: 'Prof. Taylor', room: 'B-203', type: 'lecture' },
-          { time: '11:15 AM - 12:15 PM', subject: 'Database Lab', faculty: 'Dr. Brown', room: 'Lab-2', type: 'lab' },
-          { time: '12:15 PM - 1:15 PM', subject: 'Lunch Break', faculty: '', room: '', type: 'break' },
-          { time: '2:00 PM - 3:00 PM', subject: 'Operating Systems', faculty: 'Dr. Anderson', room: 'A-104', type: 'lecture' },
-          { time: '3:00 PM - 4:00 PM', subject: 'Web Development', faculty: 'Prof. Garcia', room: 'Lab-3', type: 'lab' },
-          { time: '4:15 PM - 5:15 PM', subject: 'Project Work', faculty: 'Dr. Smith', room: 'A-101', type: 'project' },
-          { time: '5:15 PM - 6:15 PM', subject: 'Free Period', faculty: '', room: '', type: 'free' }
-        ],
-        // Add more days...
-      };
-    } else if (user?.role === 'faculty') {
-      return {
-        Monday: [
-          { time: '9:00 AM - 10:00 AM', subject: 'Data Structures', class: 'CS-301', room: 'A-101', type: 'lecture' },
-          { time: '10:00 AM - 11:00 AM', subject: 'Free Period', class: '', room: '', type: 'free' },
-          { time: '11:15 AM - 12:15 PM', subject: 'Data Structures Lab', class: 'CS-301', room: 'Lab-1', type: 'lab' },
-          { time: '12:15 PM - 1:15 PM', subject: 'Lunch Break', class: '', room: '', type: 'break' },
-          { time: '2:00 PM - 3:00 PM', subject: 'Advanced Algorithms', class: 'CS-401', room: 'A-102', type: 'lecture' },
-          { time: '3:00 PM - 4:00 PM', subject: 'Research Guidance', class: 'PhD Students', room: 'Research Lab', type: 'research' },
-          { time: '4:15 PM - 5:15 PM', subject: 'Faculty Meeting', class: '', room: 'Conference Room', type: 'meeting' },
-          { time: '5:15 PM - 6:15 PM', subject: 'Office Hours', class: '', room: 'Office', type: 'office' }
-        ],
-        // Add more days...
-      };
-    } else {
-      // HOD/Principal view - overview of all activities
-      return {
-        Monday: [
-          { time: '9:00 AM - 10:00 AM', activity: 'Morning Assembly', location: 'Main Hall', type: 'assembly' },
-          { time: '10:00 AM - 11:00 AM', activity: 'Department Meetings', location: 'Various Rooms', type: 'meeting' },
-          { time: '11:15 AM - 12:15 PM', activity: 'Class Observations', location: 'Classrooms', type: 'observation' },
-          { time: '12:15 PM - 1:15 PM', activity: 'Lunch Break', location: '', type: 'break' },
-          { time: '2:00 PM - 3:00 PM', activity: 'Administrative Work', location: 'Office', type: 'admin' },
-          { time: '3:00 PM - 4:00 PM', activity: 'Student Counseling', location: 'Counseling Room', type: 'counseling' },
-          { time: '4:15 PM - 5:15 PM', activity: 'Faculty Evaluation', location: 'Office', type: 'evaluation' },
-          { time: '5:15 PM - 6:15 PM', activity: 'Planning Session', location: 'Conference Room', type: 'planning' }
-        ],
-        // Add more days...
-      };
-    }
-  };
-
-  const timetableData = getTimetableData();
-
-  const handleExportPDF = async () => {
-    try {
-      await pdfExportService.exportTimetable(timetableData, {
-        filename: 'timetable',
-        title: 'Class Timetable',
-        subtitle: `${user?.role === 'student' ? 'Student Schedule' : user?.role === 'faculty' ? 'Faculty Schedule' : 'Administrative Schedule'}`
-      });
-    } catch (error) {
-      console.error('Error exporting PDF:', error);
-      alert('Failed to export PDF. Please try again.');
-    }
-  };
+  const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
+  const isFaculty = user?.role === 'faculty';
 
   const handlePrint = () => {
+    const printContents = document.getElementById('weekly-timetable');
+    if (!printContents) return;
+    const originalContents = document.body.innerHTML;
+    document.body.innerHTML = printContents.outerHTML;
     window.print();
+    document.body.innerHTML = originalContents;
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'lecture': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'lab': return 'bg-green-100 text-green-800 border-green-200';
-      case 'break': return 'bg-gray-100 text-gray-600 border-gray-200';
-      case 'free': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'study': return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'project': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-      case 'research': return 'bg-pink-100 text-pink-800 border-pink-200';
-      case 'meeting': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'office': return 'bg-teal-100 text-teal-800 border-teal-200';
-      case 'assembly': return 'bg-red-100 text-red-800 border-red-200';
-      case 'observation': return 'bg-cyan-100 text-cyan-800 border-cyan-200';
-      case 'admin': return 'bg-slate-100 text-slate-800 border-slate-200';
-      case 'counseling': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-      case 'evaluation': return 'bg-violet-100 text-violet-800 border-violet-200';
-      case 'planning': return 'bg-rose-100 text-rose-800 border-rose-200';
-      default: return 'bg-gray-100 text-gray-600 border-gray-200';
-    }
-  };
+  // Faculty Timetable Matrix (week x slots)
+  const facultyMatrix = days.map(day =>
+    timeSlots.map((_, slotIdx) =>
+      facultyAssignments.find(a => a.day === day && a.slot === slotIdx) || null
+    )
+  );
 
-  const renderWeekView = () => (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse">
+  // Student Views (as before)
+  const renderStudentDayView = () => (
+    <div className={`${colors.cardBg} rounded-lg shadow-sm overflow-hidden border ${colors.cardBorder} backdrop-blur-sm`}>
+      <div className={`p-3 ${colors.timeHeader} font-medium`}>
+        {fullDays[selectedDay]}'s Schedule
+      </div>
+      <table className="w-full">
         <thead>
-          <tr>
-            <th className="border border-gray-300 p-3 bg-gray-50 text-left font-medium text-gray-900 min-w-32">
-              Time
-            </th>
-            {days.map((day) => (
-              <th key={day} className="border border-gray-300 p-3 bg-gray-50 text-center font-medium text-gray-900 min-w-48">
-                {day}
-              </th>
+          <tr className={colors.inactiveDay}>
+            <th className="p-3 text-left w-24 font-medium">Time</th>
+            <th className="p-3 text-left font-medium">Class</th>
+            <th className="p-3 text-left w-32 font-medium">Room</th>
+          </tr>
+        </thead>
+        <tbody>
+          {timeSlots.map((time, index) => {
+            const dayName = days[selectedDay];
+            const subject = timetableData[dayName as keyof typeof timetableData][index];
+            const room = roomData[dayName as keyof typeof roomData][index];
+            return (
+              <tr key={time} className={`border-t ${colors.cardBorder} hover:bg-stone-100`}>
+                <td className={`p-3 font-medium ${colors.textPrimary}`}>{time}</td>
+                <td className={`p-3 ${getTypeStyle(subject)} ${colors.textPrimary}`}>{subject}</td>
+                <td className={`p-3 ${colors.textSecondary}`}>
+                  {room && (
+                    <div className="flex items-center">
+                      <MapPin className="w-4 h-4 mr-2 text-stone-500" />
+                      {room}
+                    </div>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderStudentWeekView = () => (
+    <div id="weekly-timetable" className={`${colors.cardBg} rounded-lg shadow-sm overflow-hidden border ${colors.cardBorder} backdrop-blur-sm`}>
+      <div className={`p-3 ${colors.timeHeader} font-medium`}>
+        Weekly Timetable • {user?.department || 'Computer Science'}
+      </div>
+      <table className="w-full">
+        <thead>
+          <tr className={colors.inactiveDay}>
+            <th className="p-3 text-left w-24 font-medium">Time</th>
+            {days.map(day => (
+              <th key={day} className="p-3 text-center font-medium">{day}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {timeSlots.map((timeSlot, timeIndex) => (
-            <tr key={timeIndex}>
-              <td className="border border-gray-300 p-3 bg-gray-50 font-medium text-sm text-gray-700">
-                {timeSlot}
-              </td>
-              {days.map((day) => {
-                const dayData = timetableData[day] || [];
-                const classData = dayData[timeIndex];
-                
+          {timeSlots.map((time, timeIndex) => (
+            <tr key={time} className={`border-t ${colors.cardBorder}`}>
+              <td className={`p-3 font-medium ${colors.textPrimary}`}>{time}</td>
+              {days.map(day => {
+                const subject = timetableData[day as keyof typeof timetableData][timeIndex];
+                const room = roomData[day as keyof typeof roomData][timeIndex];
                 return (
-                  <td key={day} className="border border-gray-300 p-2">
-                    {classData && classData.subject !== 'Free Period' && classData.activity !== 'Free Period' ? (
-                      <div className={`p-3 rounded-lg border ${getTypeColor(classData.type)} h-full`}>
-                        <div className="font-medium text-sm mb-1">
-                          {classData.subject || classData.activity}
-                        </div>
-                        {user?.role === 'student' && (
-                          <>
-                            {classData.faculty && (
-                              <div className="flex items-center text-xs mb-1">
-                                <User className="w-3 h-3 mr-1" />
-                                {classData.faculty}
-                              </div>
-                            )}
-                            {classData.room && (
-                              <div className="flex items-center text-xs">
-                                <MapPin className="w-3 h-3 mr-1" />
-                                {classData.room}
-                              </div>
-                            )}
-                          </>
-                        )}
-                        {user?.role === 'faculty' && (
-                          <>
-                            {classData.class && (
-                              <div className="flex items-center text-xs mb-1">
-                                <BookOpen className="w-3 h-3 mr-1" />
-                                {classData.class}
-                              </div>
-                            )}
-                            {classData.room && (
-                              <div className="flex items-center text-xs">
-                                <MapPin className="w-3 h-3 mr-1" />
-                                {classData.room}
-                              </div>
-                            )}
-                          </>
-                        )}
-                        {(user?.role === 'hod' || user?.role === 'principal' || user?.role === 'director') && (
-                          <>
-                            {classData.location && (
-                              <div className="flex items-center text-xs">
-                                <MapPin className="w-3 h-3 mr-1" />
-                                {classData.location}
-                              </div>
-                            )}
-                          </>
-                        )}
+                  <td key={`${day}-${time}`} className={`p-2 border-l ${colors.cardBorder}`}>
+                    <div className={`p-2 rounded ${getTypeStyle(subject)} h-full ${colors.lecture}`}>
+                      <div className={`font-medium text-sm ${colors.textPrimary}`}>{subject}</div>
+                      {room && (
+                        <div className={`text-xs ${colors.textSecondary} mt-1`}>{room}</div>
+                      )}
+                    </div>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  // Faculty Views
+  const renderFacultyDayView = () => (
+    <div className={`${colors.cardBg} rounded-lg shadow-sm overflow-hidden border ${colors.cardBorder} backdrop-blur-sm`}>
+      <div className={`p-3 ${colors.timeHeader} font-medium`}>
+        {fullDays[selectedDay]}'s Teaching Schedule
+      </div>
+      <table className="w-full">
+        <thead>
+          <tr className={colors.inactiveDay}>
+            <th className="p-3 text-left w-24 font-medium">Time</th>
+            <th className="p-3 text-left font-medium">Subject</th>
+            <th className="p-3 text-left font-medium">Section</th>
+            <th className="p-3 text-left w-32 font-medium">Room</th>
+          </tr>
+        </thead>
+        <tbody>
+          {facultyMatrix[selectedDay].map((slot, idx) => (
+            <tr key={timeSlots[idx]} className={`border-t ${colors.cardBorder} hover:bg-stone-100`}>
+              <td className={`p-3 font-medium ${colors.textPrimary}`}>{timeSlots[idx]}</td>
+              <td className={`p-3 ${colors.textPrimary}`}>{slot ? slot.subject : <span className="text-stone-400">Free</span>}</td>
+              <td className={`p-3 ${colors.textSecondary}`}>{slot ? slot.section : '-'}</td>
+              <td className={`p-3 ${colors.textSecondary}`}>
+                {slot && slot.room ? (
+                  <div className="flex items-center">
+                    <MapPin className="w-4 h-4 mr-2 text-stone-500" />
+                    {slot.room}
+                  </div>
+                ) : ''}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderFacultyWeekView = () => (
+    <div id="weekly-timetable" className={`${colors.cardBg} rounded-lg shadow-sm overflow-hidden border ${colors.cardBorder} backdrop-blur-sm`}>
+      <div className={`p-3 ${colors.timeHeader} font-medium`}>
+        Weekly Teaching Schedule
+      </div>
+      <table className="w-full">
+        <thead>
+          <tr className={colors.inactiveDay}>
+            <th className="p-3 text-left w-24 font-medium">Time</th>
+            {days.map(day => (
+              <th key={day} className="p-3 text-center font-medium">{day}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {timeSlots.map((time, slotIdx) => (
+            <tr key={time} className={`border-t ${colors.cardBorder}`}>
+              <td className={`p-3 font-medium ${colors.textPrimary}`}>{time}</td>
+              {days.map((day, dayIdx) => {
+                const slot = facultyMatrix[dayIdx][slotIdx];
+                return (
+                  <td key={day + time} className={`p-2 border-l ${colors.cardBorder}`}>
+                    {slot ? (
+                      <div className={`p-2 rounded h-full ${colors.lecture}`}>
+                        <div className="font-medium text-sm">{slot.subject}</div>
+                        <div className="text-xs text-stone-500 mt-1">Section: {slot.section}</div>
+                        <div className="text-xs text-stone-500">{slot.room}</div>
                       </div>
                     ) : (
-                      <div className="p-3 text-center text-gray-400 text-sm">
-                        {classData?.subject || classData?.activity || 'Free'}
-                      </div>
+                      <div className="text-stone-300 text-xs text-center">Free</div>
                     )}
                   </td>
                 );
@@ -211,231 +238,114 @@ const TimetablePage: React.FC = () => {
     </div>
   );
 
-  const renderDayView = () => {
-    const selectedDayName = days[selectedDay];
-    const dayData = timetableData[selectedDayName] || [];
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-gray-900">{selectedDayName}</h3>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setSelectedDay(prev => prev > 0 ? prev - 1 : days.length - 1)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setSelectedDay(prev => prev < days.length - 1 ? prev + 1 : 0)}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        <div className="grid gap-3">
-          {dayData.map((classData, index) => (
-            <div key={index} className={`p-4 rounded-lg border ${getTypeColor(classData.type)}`}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="font-medium text-lg">
-                  {classData.subject || classData.activity}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Clock className="w-4 h-4 mr-1" />
-                  {timeSlots[index]}
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                {user?.role === 'student' && (
-                  <>
-                    {classData.faculty && (
-                      <div className="flex items-center">
-                        <User className="w-4 h-4 mr-2" />
-                        <span>Faculty: {classData.faculty}</span>
-                      </div>
-                    )}
-                    {classData.room && (
-                      <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-2" />
-                        <span>Room: {classData.room}</span>
-                      </div>
-                    )}
-                  </>
-                )}
-                
-                {user?.role === 'faculty' && (
-                  <>
-                    {classData.class && (
-                      <div className="flex items-center">
-                        <BookOpen className="w-4 h-4 mr-2" />
-                        <span>Class: {classData.class}</span>
-                      </div>
-                    )}
-                    {classData.room && (
-                      <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-2" />
-                        <span>Room: {classData.room}</span>
-                      </div>
-                    )}
-                  </>
-                )}
-                
-                {(user?.role === 'hod' || user?.role === 'principal' || user?.role === 'director') && (
-                  <>
-                    {classData.location && (
-                      <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-2" />
-                        <span>Location: {classData.location}</span>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <Layout>
+      {/* Background with subtle overlay */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-stone-100/30"></div>
+        <img
+          src="https://t3.ftcdn.net/jpg/04/46/95/98/240_F_446959837_ud38y0tq3BLXku5g72xfD4JT087Cz5R7.jpg"
+          alt="Background"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="space-y-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="p-4 max-w-6xl mx-auto"
       >
-        <div className="flex justify-between items-center">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Timetable</h1>
-            <p className="text-gray-600">
-              {user?.role === 'student' ? 'Your class schedule and academic timetable' :
-               user?.role === 'faculty' ? 'Your teaching schedule and faculty duties' :
-               'Institutional schedule overview and management'}
+            <h1 className={`text-xl font-semibold ${colors.textPrimary}`}>
+              {isFaculty ? 'Faculty Timetable' : 'Academic Timetable'}
+            </h1>
+            <p className={`${colors.textSecondary} text-sm`}>
+              {viewMode === 'day'
+                ? fullDays[selectedDay] + (isFaculty ? " (Your Classes)" : "")
+                : isFaculty ? 'Weekly Teaching Overview' : 'Weekly Overview'}
             </p>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-2">
-              <Filter className="w-4 h-4 text-gray-500" />
-              <select
-                value={selectedView}
-                onChange={(e) => setSelectedView(e.target.value as 'week' | 'day')}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          <div className="flex flex-wrap gap-2">
+            <div className="flex bg-stone-200 rounded-md p-1">
+              <button
+                onClick={() => setViewMode('day')}
+                className={`px-3 py-1 rounded text-sm ${viewMode === 'day' ? `${colors.accent} ${colors.textPrimary}` : `${colors.textSecondary} hover:${colors.textPrimary}`}`}
               >
-                <option value="week">Week View</option>
-                <option value="day">Day View</option>
-              </select>
+                Day View
+              </button>
+              <button
+                onClick={() => setViewMode('week')}
+                className={`px-3 py-1 rounded text-sm ${viewMode === 'week' ? `${colors.accent} ${colors.textPrimary}` : `${colors.textSecondary} hover:${colors.textPrimary}`}`}
+              >
+                Week View
+              </button>
             </div>
-            <button 
-              onClick={handleExportPDF}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span>Export PDF</span>
-            </button>
-            <button 
-              onClick={handlePrint}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Printer className="w-4 h-4" />
-              <span>Print</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Current Time Indicator */}
-        <div className="bg-gradient-to-r from-primary-50 to-accent-50 border border-primary-200 rounded-xl p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Calendar className="w-6 h-6 text-primary-600" />
-              <div>
-                <h3 className="font-medium text-primary-900">Current Time</h3>
-                <p className="text-sm text-primary-700">
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })} - {new Date().toLocaleTimeString()}
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-primary-600 font-medium">Next Class</p>
-              <p className="text-xs text-primary-700">
-                {user?.role === 'student' ? 'Database Systems at 2:00 PM' :
-                 user?.role === 'faculty' ? 'Advanced Algorithms at 2:00 PM' :
-                 'Department Meeting at 2:00 PM'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Timetable Content */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-              <Calendar className="w-5 h-5 text-primary-600" />
-              <span>
-                {selectedView === 'week' ? 'Weekly Schedule' : 'Daily Schedule'}
-              </span>
-            </h3>
-            
-            {selectedView === 'week' && (
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setSelectedWeek(prev => prev - 1)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <span className="text-sm text-gray-600 px-3">
-                  Week {selectedWeek + 1}
-                </span>
-                <button
-                  onClick={() => setSelectedWeek(prev => prev + 1)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
+            {viewMode === 'week' && (
+              <button 
+                onClick={handlePrint}
+                className={`flex items-center gap-2 px-3 py-1 ${colors.accent} ${colors.textPrimary} rounded text-sm hover:bg-stone-500`}
+              >
+                <Printer className="w-4 h-4" />
+                Print
+              </button>
             )}
           </div>
-
-          <div id="timetable-content">
-            {selectedView === 'week' ? renderWeekView() : renderDayView()}
-          </div>
         </div>
 
-        {/* Legend */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Legend</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {[
-              { type: 'lecture', label: 'Lecture' },
-              { type: 'lab', label: 'Laboratory' },
-              { type: 'break', label: 'Break' },
-              { type: 'free', label: 'Free Period' },
-              { type: 'study', label: 'Study Hall' },
-              { type: 'project', label: 'Project Work' },
-              { type: 'research', label: 'Research' },
-              { type: 'meeting', label: 'Meeting' },
-              { type: 'office', label: 'Office Hours' },
-              { type: 'assembly', label: 'Assembly' },
-              { type: 'observation', label: 'Observation' },
-              { type: 'admin', label: 'Administrative' }
-            ].map((item) => (
-              <div key={item.type} className="flex items-center space-x-2">
-                <div className={`w-4 h-4 rounded border ${getTypeColor(item.type)}`}></div>
-                <span className="text-sm text-gray-700">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        {viewMode === 'day' ? (
+          <>
+            {/* Day selector */}
+            <div className="flex overflow-x-auto pb-2 mb-4 gap-1">
+              {days.map((day, index) => (
+                <button
+                  key={day}
+                  onClick={() => setSelectedDay(index)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium min-w-[70px] transition-colors ${
+                    selectedDay === index 
+                      ? `${colors.currentDay}` 
+                      : `${colors.inactiveDay}`
+                  }`}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+            {isFaculty ? renderFacultyDayView() : renderStudentDayView()}
+            {/* Day navigation */}
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={() => setSelectedDay(prev => prev > 0 ? prev - 1 : days.length - 1)}
+                className={`flex items-center gap-2 px-4 py-2 ${colors.accent} ${colors.textPrimary} rounded-md hover:bg-stone-500`}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous Day
+              </button>
+              <button
+                onClick={() => setSelectedDay(prev => prev < days.length - 1 ? prev + 1 : 0)}
+                className={`flex items-center gap-2 px-4 py-2 ${colors.accent} ${colors.textPrimary} rounded-md hover:bg-stone-500`}
+              >
+                Next Day
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            {isFaculty ? renderFacultyWeekView() : renderStudentWeekView()}
+            <div className="mt-4 flex justify-end">
+              <button 
+                onClick={handlePrint}
+                className={`flex items-center gap-2 px-4 py-2 ${colors.accent} ${colors.textPrimary} rounded-md hover:bg-stone-500`}
+              >
+                <Printer className="w-4 h-4" />
+                Print Weekly Timetable
+              </button>
+            </div>
+          </>
+        )}
       </motion.div>
     </Layout>
   );
