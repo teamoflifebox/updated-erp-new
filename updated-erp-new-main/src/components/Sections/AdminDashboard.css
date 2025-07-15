@@ -1,0 +1,193 @@
+/* === Container === */
+.admin-dashboard-container {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* === Video Background === */
+.video-background {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+}
+
+.video-background video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.3); /* softened glass overlay */
+  backdrop-filter: blur(2px); /* subtle blur */
+  z-index: -1;
+}
+
+/* === Dashboard Content === */
+.admin-dashboard-content {
+  position: relative;
+  z-index: 1;
+  padding: 3rem 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #4f46e5, #9333ea);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dashboard-subtitle {
+  font-size: 1rem;
+  color: #d1d5db;
+}
+
+.realtime-status {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  margin-right: 0.5rem;
+}
+
+.status-dot.online {
+  background: #22c55e;
+  animation: pulse 1.5s infinite;
+}
+
+.status-dot.offline {
+  background: #ef4444;
+}
+
+.last-update {
+  margin-left: 0.5rem;
+  color: #cbd5e1;
+}
+
+.analytics-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.5rem;
+  color: #93c5fd;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.4s ease;
+}
+
+.analytics-link:hover {
+  color: #60a5fa;
+}
+
+.analytics-link svg {
+  margin-right: 0.3rem;
+}
+
+/* === Cards Grid === */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+/* === Chart Sections === */
+.chart-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.chart-card {
+  background: rgba(255, 255, 255, 0.025); /* softer transparency */
+  border: 1px solid rgba(255, 255, 255, 0.05); /* lighter border */
+  backdrop-filter: blur(4px); /* subtle blur */
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.chart-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.chart-header select {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: rgba(255, 255, 255, 0.2);
+  color: #111827;
+}
+
+.filters select {
+  margin-left: 0.5rem;
+}
+
+/* === Pie Chart Section === */
+.pie-section {
+  margin-bottom: 3rem;
+}
+
+/* === Dashboard Card === (Example) */
+.dashboard-card {
+  background: rgba(255, 255, 255, 0.025); /* softer transparency */
+  border: 1px solid rgba(255, 255, 255, 0.05); /* lighter border */
+  backdrop-filter: blur(3px); /* subtle blur */
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* === Pulse Animation === */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* === Responsive === */
+@media (max-width: 900px) {
+  .chart-section {
+    grid-template-columns: 1fr;
+  }
+}
