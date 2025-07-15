@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-
-import LoginModal from './LoginModal';
 import {
   ChevronDown, Users, Award, Calendar, MapPin, Phone, Mail, ExternalLink,
   Menu, X, Star, Building, GraduationCap, Trophy, ChevronRight, PlayCircle,
-  Globe, BookOpen, Zap, Target, TrendingUp, Facebook, Instagram, Linkedin, Youtube, CheckCircle, LogIn
+  Globe, BookOpen, Zap, Target, TrendingUp, Facebook, Instagram, Linkedin, Youtube, CheckCircle, LogIn,
+  User, Lock, Eye, EyeOff, Clock
 } from 'lucide-react';
-import LoginPage from './LoginPage';
 
 interface UserData {
   name?: string;
@@ -40,13 +38,412 @@ interface Faculty {
   image: string;
 }
 
-function LandingPage(): JSX.Element {
+// Login Modal Component
+const LoginModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+  const [activeTab, setActiveTab] = useState<'student' | 'faculty' | 'admin'>('student');
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    rememberMe: false
+  });
+
+  if (!isOpen) return null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Login attempt:', { ...formData, userType: activeTab });
+    onClose();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">Login</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-500" />
+          </button>
+        </div>
+
+        <div className="p-6">
+          <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
+            {[
+              { id: 'student', label: 'Student' },
+              { id: 'faculty', label: 'Faculty' },
+              { id: 'admin', label: 'Admin' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as 'student' | 'faculty' | 'admin')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-white text-orange-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none"
+                  placeholder="Enter your password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="rememberMe"
+                  name="rememberMe"
+                  type="checkbox"
+                  checked={formData.rememberMe}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                />
+                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
+                  Remember me
+                </label>
+              </div>
+              <button
+                type="button"
+                className="text-sm text-orange-600 hover:text-orange-700"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 transition-colors font-semibold"
+            >
+              Login as {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center text-sm text-gray-600">
+            <p>
+              Don't have an account?{' '}
+              <button className="text-orange-600 hover:text-orange-700 font-medium">
+                Contact Admin
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Course Modal Component
+const CourseModal: React.FC<{ isOpen: boolean; onClose: () => void; course: Course | null }> = ({ isOpen, onClose, course }) => {
+  if (!isOpen || !course) return null;
+
+  const getCourseDetails = (courseName: string) => {
+    const courseDetails: { [key: string]: any } = {
+      'Computer Science Engineering': {
+        description: 'Computer Science Engineering focuses on the design and development of computer systems and computational processes. Students learn programming, software engineering, algorithms, data structures, and emerging technologies.',
+        subjects: ['Programming Languages', 'Data Structures & Algorithms', 'Database Management', 'Software Engineering', 'Computer Networks', 'Artificial Intelligence', 'Machine Learning', 'Web Development'],
+        careerProspects: ['Software Developer', 'Data Scientist', 'System Analyst', 'AI Engineer', 'Cybersecurity Specialist', 'Full Stack Developer', 'Mobile App Developer', 'DevOps Engineer'],
+        facilities: ['Advanced Computer Labs', 'High-Performance Computing Center', 'Software Development Labs', 'AI & ML Research Center'],
+        eligibilityRequirements: 'Pass in 10+2 with Physics, Chemistry, and Mathematics with minimum 60% marks',
+        fees: '₹1,50,000 per year'
+      },
+      'Electronics & Communication': {
+        description: 'Electronics & Communication Engineering deals with electronic devices, circuits, communication equipment, and systems. Students learn about signal processing, telecommunications, and electronic system design.',
+        subjects: ['Electronic Circuits', 'Digital Signal Processing', 'Communication Systems', 'Microprocessors', 'VLSI Design', 'Antenna Theory', 'Wireless Communication', 'Embedded Systems'],
+        careerProspects: ['Electronics Engineer', 'Communication Engineer', 'VLSI Engineer', 'RF Engineer', 'Embedded Systems Developer', 'Network Engineer', 'Hardware Designer', 'Telecom Specialist'],
+        facilities: ['Electronics Labs', 'Communication Labs', 'VLSI Design Lab', 'Microwave Lab', 'Digital Signal Processing Lab'],
+        eligibilityRequirements: 'Pass in 10+2 with Physics, Chemistry, and Mathematics with minimum 60% marks',
+        fees: '₹1,40,000 per year'
+      },
+      'Electrical Engineering': {
+        description: 'Electrical Engineering focuses on the study and application of electricity, electronics, and electromagnetism. Students learn about power systems, control systems, and electrical machinery.',
+        subjects: ['Electrical Circuits', 'Power Systems', 'Control Systems', 'Electrical Machines', 'Power Electronics', 'Renewable Energy', 'High Voltage Engineering', 'Smart Grid Technology'],
+        careerProspects: ['Electrical Engineer', 'Power Systems Engineer', 'Control Systems Engineer', 'Renewable Energy Engineer', 'Project Manager', 'Electrical Designer', 'Automation Engineer', 'Energy Consultant'],
+        facilities: ['Electrical Machines Lab', 'Power Systems Lab', 'Control Systems Lab', 'High Voltage Lab', 'Renewable Energy Lab'],
+        eligibilityRequirements: 'Pass in 10+2 with Physics, Chemistry, and Mathematics with minimum 60% marks',
+        fees: '₹1,35,000 per year'
+      },
+      'Mechanical Engineering': {
+        description: 'Mechanical Engineering involves the design, analysis, and manufacturing of mechanical systems. Students learn about thermodynamics, fluid mechanics, materials science, and manufacturing processes.',
+        subjects: ['Thermodynamics', 'Fluid Mechanics', 'Machine Design', 'Manufacturing Processes', 'Heat Transfer', 'Automotive Engineering', 'Robotics', 'CAD/CAM'],
+        careerProspects: ['Mechanical Engineer', 'Design Engineer', 'Manufacturing Engineer', 'Automotive Engineer', 'Project Engineer', 'Quality Control Engineer', 'R&D Engineer', 'Production Manager'],
+        facilities: ['Mechanical Workshop', 'CAD/CAM Lab', 'Fluid Mechanics Lab', 'Thermal Engineering Lab', 'Manufacturing Lab'],
+        eligibilityRequirements: 'Pass in 10+2 with Physics, Chemistry, and Mathematics with minimum 60% marks',
+        fees: '₹1,30,000 per year'
+      },
+      'Civil Engineering': {
+        description: 'Civil Engineering focuses on the design, construction, and maintenance of infrastructure projects. Students learn about structural engineering, transportation, water resources, and environmental engineering.',
+        subjects: ['Structural Engineering', 'Transportation Engineering', 'Water Resources Engineering', 'Environmental Engineering', 'Construction Management', 'Geotechnical Engineering', 'Surveying', 'Building Technology'],
+        careerProspects: ['Civil Engineer', 'Structural Engineer', 'Transportation Engineer', 'Environmental Engineer', 'Project Manager', 'Construction Manager', 'Urban Planner', 'Site Engineer'],
+        facilities: ['Structural Engineering Lab', 'Environmental Engineering Lab', 'Transportation Lab', 'Geotechnical Lab', 'Survey Lab'],
+        eligibilityRequirements: 'Pass in 10+2 with Physics, Chemistry, and Mathematics with minimum 60% marks',
+        fees: '₹1,25,000 per year'
+      },
+      'Information Technology': {
+        description: 'Information Technology focuses on the application of computing technology to solve business and organizational problems. Students learn about software development, database management, and IT systems.',
+        subjects: ['Programming', 'Database Management', 'Web Technologies', 'Network Security', 'System Analysis', 'Mobile Computing', 'Cloud Computing', 'IT Project Management'],
+        careerProspects: ['IT Consultant', 'Systems Administrator', 'Web Developer', 'Database Administrator', 'Network Administrator', 'IT Manager', 'Software Tester', 'Business Analyst'],
+        facilities: ['IT Labs', 'Network Lab', 'Database Lab', 'Web Development Lab', 'Mobile App Development Lab'],
+        eligibilityRequirements: 'Pass in 10+2 with Physics, Chemistry, and Mathematics with minimum 60% marks',
+        fees: '₹1,45,000 per year'
+      }
+    };
+
+    return courseDetails[courseName] || {};
+  };
+
+  const details = getCourseDetails(course.name);
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="bg-orange-100 rounded-full p-3">
+              <div className="text-orange-600">
+                {course.icon}
+              </div>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">{course.name}</h2>
+              <p className="text-gray-600">{course.code} • {course.duration}</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-500" />
+          </button>
+        </div>
+
+        <div className="p-6">
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Program Overview</h3>
+              <p className="text-gray-600 mb-6 leading-relaxed">{details.description}</p>
+
+              <div className="bg-orange-50 rounded-xl p-6 mb-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-orange-600" />
+                  Program Highlights
+                </h4>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="w-4 h-4 text-orange-600" />
+                    Industry-aligned curriculum
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="w-4 h-4 text-orange-600" />
+                    Hands-on practical training
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="w-4 h-4 text-orange-600" />
+                    Expert faculty guidance
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="w-4 h-4 text-orange-600" />
+                    Modern lab facilities
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-orange-600" />
+                  Admission Requirements
+                </h4>
+                <p className="text-gray-700 mb-4">{details.eligibilityRequirements}</p>
+                <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    <span>Duration: {course.duration}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    <span>Fees: {details.fees}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Core Subjects</h3>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {details.subjects?.map((subject: string, index: number) => (
+                  <div key={index} className="bg-white border border-gray-200 rounded-lg p-3 text-sm text-gray-700">
+                    {subject}
+                  </div>
+                ))}
+              </div>
+
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Career Prospects</h3>
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {details.careerProspects?.map((career: string, index: number) => (
+                  <div key={index} className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-sm text-orange-700">
+                    {career}
+                  </div>
+                ))}
+              </div>
+
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Facilities</h3>
+              <div className="space-y-2 mb-6">
+                {details.facilities?.map((facility: string, index: number) => (
+                  <div key={index} className="flex items-center gap-2 text-gray-700">
+                    <ChevronRight className="w-4 h-4 text-orange-600" />
+                    {facility}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-gray-200">
+            <button className="flex-1 bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors font-semibold">
+              Apply Now
+            </button>
+            <button className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors font-semibold">
+              Download Brochure
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Event Registration Modal Component
+const EventRegistrationModal: React.FC<{ isOpen: boolean; onClose: () => void; event: Event | null }> = ({ isOpen, onClose, event }) => {
+  if (!isOpen || !event) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-900">Event Registration</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
+
+        <div className="p-6 text-center">
+          <div className="bg-green-100 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-12 h-12 text-green-600" />
+          </div>
+          
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">Event Completed!</h3>
+          <p className="text-gray-600 mb-6">
+            Thank you for your interest in this event. This event has already been completed successfully.
+          </p>
+
+          <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+            <h4 className="font-semibold text-gray-900 mb-3">{event.title}</h4>
+            <div className="space-y-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>{event.date}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded-full text-xs font-medium">
+                  {event.type}
+                </span>
+              </div>
+            </div>
+            <p className="text-gray-700 mt-3 text-sm">{event.description}</p>
+          </div>
+
+          <div className="text-sm text-gray-600 mb-6">
+            <p className="mb-2">Stay tuned for upcoming events!</p>
+            <p>Follow our social media or check our events page for the latest updates.</p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button 
+              onClick={onClose}
+              className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
+            >
+              Close
+            </button>
+            <button className="flex-1 bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors font-semibold">
+              View More Events
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main App Component
+function App(): JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userType, setUserType] = useState<string>('');
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [currentSlide, setCurrentSlide] = useState<number>(0);
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
+  const [showCourseModal, setShowCourseModal] = useState<boolean>(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [showEventModal, setShowEventModal] = useState<boolean>(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const galleryImages: string[] = [
     'https://images.pexels.com/photos/159844/cellular-education-classroom-159844.jpeg?auto=compress&cs=tinysrgb&w=800',
@@ -162,10 +559,19 @@ function LandingPage(): JSX.Element {
     setUserData(null);
   };
 
+  const handleCourseLearnMore = (course: Course) => {
+    setSelectedCourse(course);
+    setShowCourseModal(true);
+  };
+
+  const handleEventRegister = (event: Event) => {
+    setSelectedEvent(event);
+    setShowEventModal(true);
+  };
 
   return (
     <div className="min-h-screen bg-white">
-     {/* Sticky Announcement Bar */}
+      {/* Sticky Announcement Bar */}
       <div className="bg-orange-600 text-white py-2 px-4 text-center text-sm font-medium">
         <span className="flex items-center justify-center gap-2">
           <span className="animate-pulse">🚨</span>
@@ -190,14 +596,13 @@ function LandingPage(): JSX.Element {
               <button onClick={() => scrollToSection('events')} className="text-gray-700 hover:text-orange-600 transition-colors">Events</button>
               <button onClick={() => scrollToSection('placements')} className="text-gray-700 hover:text-orange-600 transition-colors">Placements</button>
               <button onClick={() => scrollToSection('contact')} className="text-gray-700 hover:text-orange-600 transition-colors">Contact</button>
-               <button 
-                    onClick={() => setShowLoginModal(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-lg"
-                >
-                        <LogIn className="w-4 h-4" />
-                        <span>Login</span>
-                        
-                </button>
+              <button 
+                onClick={() => setShowLoginModal(true)}
+                className="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-lg"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Login</span>
+              </button>
             </div>
 
             {/* Mobile menu button */}
@@ -219,20 +624,17 @@ function LandingPage(): JSX.Element {
               <button onClick={() => scrollToSection('events')} className="block w-full text-left px-3 py-2 text-gray-700 hover:text-orange-600 transition-colors">Events</button>
               <button onClick={() => scrollToSection('placements')} className="block w-full text-left px-3 py-2 text-gray-700 hover:text-orange-600 transition-colors">Placements</button>
               <button onClick={() => scrollToSection('contact')} className="block w-full text-left px-3 py-2 text-gray-700 hover:text-orange-600 transition-colors">Contact</button>
-           <button 
+              <button 
                 onClick={() => setShowLoginModal(true)}
                 className="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-lg"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Login</span>
               </button>
-             
             </div>
           </div>
         )}
       </nav>
-
-     
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -349,7 +751,10 @@ function LandingPage(): JSX.Element {
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{course.name}</h3>
                 <p className="text-gray-600 mb-4">Duration: {course.duration}</p>
                 <p className="text-gray-600 mb-6">Bachelor of Technology program designed to provide comprehensive knowledge and practical skills in {course.name.toLowerCase()}.</p>
-                <button className="text-orange-600 font-semibold hover:text-orange-700 transition-colors flex items-center gap-2">
+                <button 
+                  onClick={() => handleCourseLearnMore(course)}
+                  className="text-orange-600 font-semibold hover:text-orange-700 transition-colors flex items-center gap-2"
+                >
                   Learn More <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -380,7 +785,10 @@ function LandingPage(): JSX.Element {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{event.title}</h3>
                 <p className="text-gray-600 mb-6">{event.description}</p>
-                <button className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors">
+                <button 
+                  onClick={() => handleEventRegister(event)}
+                  className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors"
+                >
                   Register Now
                 </button>
               </div>
@@ -431,7 +839,6 @@ function LandingPage(): JSX.Element {
                     alt={`${company.name} logo`}
                     className="max-h-12 max-w-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
                     onError={(e) => {
-                      // Fallback to text if image fails to load
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
                       const parent = target.parentElement;
@@ -506,81 +913,90 @@ function LandingPage(): JSX.Element {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 bg-gray-50">
+      <section id="contact" className="py-20 bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Contact Us</h2>
-            <p className="text-xl text-gray-600">Get in Touch with Us</p>
+            <p className="text-xl text-gray-600">We'd love to hear from you! Reach out with any questions or feedback.</p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
               <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <MapPin className="w-6 h-6 text-orange-600" />
+                <ul className="space-y-5 text-gray-700 text-base">
+                  <li className="flex items-start gap-4">
+                    <MapPin className="w-6 h-6 text-orange-600 mt-1" />
                     <div>
-                      <p className="font-semibold text-gray-900">Address</p>
-                      <p className="text-gray-600">123 Education Lane, Oxford City, State 12345</p>
+                      <p className="font-semibold">Address</p>
+                      <p>
+                        8-256/1, Dasaripalem (V),<br />
+                        Vipparla (Post), Palnadu (Dist),<br />
+                        Andhra Pradesh - 522615
+                      </p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Phone className="w-6 h-6 text-orange-600" />
+                  </li>
+                  <li className="flex items-start gap-4">
+                    <Phone className="w-6 h-6 text-orange-600 mt-1" />
                     <div>
-                      <p className="font-semibold text-gray-900">Phone</p>
-                      <p className="text-gray-600">+1 (555) 123-4567</p>
+                      <p className="font-semibold">Phone</p>
+                      <p>+91 9133843912</p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Mail className="w-6 h-6 text-orange-600" />
+                  </li>
+                  <li className="flex items-start gap-4">
+                    <Mail className="w-6 h-6 text-orange-600 mt-1" />
                     <div>
-                      <p className="font-semibold text-gray-900">Email</p>
-                      <p className="text-gray-600">info@oxfordcollege.edu</p>
+                      <p className="font-semibold">Email</p>
+                      <p>careers@lifeboxnextgen.co.site</p>
                     </div>
-                  </div>
-                </div>
+                  </li>
+                </ul>
               </div>
 
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Inquiry</h3>
-                <form className="space-y-4">
-                  <div>
-                    <input 
-                      type="text" 
-                      placeholder="Your Name" 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <input 
-                      type="email" 
-                      placeholder="Your Email" 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <textarea 
-                      placeholder="Your Message" 
-                      rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600 focus:border-transparent"
-                    ></textarea>
-                  </div>
-                  <button className="w-full bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors">
-                    Send Message
+                <form className="space-y-5">
+                  <input 
+                    type="text" 
+                    placeholder="Full Name"
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
+                  />
+                  <input 
+                    type="email" 
+                    placeholder="Email Address"
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
+                  />
+                  <textarea 
+                    placeholder="Your Message" 
+                    rows={4}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
+                  ></textarea>
+                  <button 
+                    type="submit"
+                    className="w-full bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors"
+                  >
+                    Submit Inquiry
                   </button>
                 </form>
               </div>
             </div>
 
             <div>
-              <div className="bg-white rounded-2xl shadow-lg p-8 h-96">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Visit Our Campus</h3>
-                <div className="bg-gray-200 rounded-lg h-full flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">Interactive Map Coming Soon</p>
-                  </div>
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+                <h3 className="text-2xl font-bold text-gray-900 px-8 pt-8">Visit Our Campus</h3>
+                <div className="mt-6">
+                  <iframe
+                    title="Campus Location"
+                    width="100%"
+                    height="360"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    allowFullScreen
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119052.3732031214!2d79.61010132858258!3d16.290234678257885!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b20a92c7b2eb3%3A0xfdb3c8d3932a820e!2sPalnadu%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1628949581449!5m2!1sen!2sin"
+                  ></iframe>
                 </div>
               </div>
             </div>
@@ -647,13 +1063,25 @@ function LandingPage(): JSX.Element {
           </div>
         </div>
       </footer>
-          {showLoginModal && (
-        // <LoginModal onClose={() => setShowLoginModal(false)} isOpen={false} />
-        <LoginModal onClose={() => setShowLoginModal(false)} isOpen={showLoginModal} />
 
-)}
+      {/* Modals */}
+      {showLoginModal && (
+        <LoginModal onClose={() => setShowLoginModal(false)} isOpen={showLoginModal} />
+      )}
+
+      <CourseModal
+        isOpen={showCourseModal}
+        onClose={() => setShowCourseModal(false)}
+        course={selectedCourse}
+      />
+
+      <EventRegistrationModal
+        isOpen={showEventModal}
+        onClose={() => setShowEventModal(false)}
+        event={selectedEvent}
+      />
     </div>
   );
 }
 
-export default LandingPage;
+export default App;
