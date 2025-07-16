@@ -17,6 +17,9 @@ import TimetablePage from './pages/TimetablePage';
 import SettingsPage from './pages/SettingsPage';
 import NotificationCenter from './components/WhatsApp/NotificationCenter';
 import RealTimeAnalyticsPage from './pages/RealTimeAnalyticsPage';
+import AlumniPage from './pages/AlumniPage';
+import AcademicPage from './pages/AcademicModal';
+import AdmissionsPage from './pages/AdmissionsPage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -47,6 +50,9 @@ const AppRoutes: React.FC = () => {
     <Routes>
       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+      <Route path="/alumni" element={<AlumniPage />} />
+      <Route path="/admissions" element={<AdmissionsPage/>} />
+      <Route path="/academics" element={<AcademicPage />} />
       
       <Route path="/dashboard" element={
         <ProtectedRoute>

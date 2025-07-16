@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   ChevronDown, Users, Award, Calendar, MapPin, Phone, Mail, ExternalLink,
   Menu, X, Star, Building, GraduationCap, Trophy, ChevronRight, PlayCircle,
@@ -1006,63 +1007,130 @@ function App(): JSX.Element {
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <GraduationCap className="w-8 h-8 text-orange-600" />
-                <span className="text-xl font-bold">Oxford College</span>
-              </div>
-              <p className="text-gray-400 mb-4">
-                Igniting Innovation, Shaping Engineers for a Better Tomorrow
-              </p>
-              <div className="flex space-x-4">
-                <Facebook className="w-6 h-6 text-gray-400 hover:text-orange-600 cursor-pointer transition-colors" />
-                <Instagram className="w-6 h-6 text-gray-400 hover:text-orange-600 cursor-pointer transition-colors" />
-                <Linkedin className="w-6 h-6 text-gray-400 hover:text-orange-600 cursor-pointer transition-colors" />
-                <Youtube className="w-6 h-6 text-gray-400 hover:text-orange-600 cursor-pointer transition-colors" />
-              </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-4 gap-8">
+          <div>
+            <div className="flex items-center space-x-3 mb-4">
+              <GraduationCap className="w-8 h-8 text-orange-600" />
+              <span className="text-xl font-bold">Oxford College</span>
             </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-orange-600 transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Courses</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Admissions</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Events</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Alumni</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Academics</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Undergraduate</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Postgraduate</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Research</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Library</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">E-Learning</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Resources</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Student Portal</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Faculty Portal</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Career Services</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">Downloads</a></li>
-                <li><a href="#" className="hover:text-orange-600 transition-colors">News</a></li>
-              </ul>
+            <p className="text-gray-400 mb-4">
+              Igniting Innovation, Shaping Engineers for a Better Tomorrow
+            </p>
+            <div className="flex space-x-4">
+              <Facebook className="w-6 h-6 text-gray-400 hover:text-orange-600 cursor-pointer transition-colors" />
+              <Instagram className="w-6 h-6 text-gray-400 hover:text-orange-600 cursor-pointer transition-colors" />
+              <Linkedin className="w-6 h-6 text-gray-400 hover:text-orange-600 cursor-pointer transition-colors" />
+              <Youtube className="w-6 h-6 text-gray-400 hover:text-orange-600 cursor-pointer transition-colors" />
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Oxford College of Engineering. All rights reserved.</p>
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <ul className="space-y-2 text-gray-400">
+              <li>
+                <button 
+                  onClick={() => scrollToSection('about')}
+                  className="hover:text-orange-600 transition-colors text-left"
+                >
+                  About Us
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => scrollToSection('programs')}
+                  className="hover:text-orange-600 transition-colors text-left"
+                >
+                  Courses
+                </button>
+              </li>
+              <li>
+                <a href="/admissions" className="hover:text-orange-600 transition-colors">
+                  Admissions
+                </a>
+              </li>
+              <li>
+                <button 
+                  onClick={() => scrollToSection('events')}
+                  className="hover:text-orange-600 transition-colors text-left"
+                >
+                  Events
+                </button>
+              </li>
+              <li>
+                <a href="/alumni" className="hover:text-orange-600 transition-colors">
+                  Alumni
+                </a>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Academics</h4>
+            <ul className="space-y-2 text-gray-400">
+              <li>
+                <Link to="/academics" className="hover:text-orange-600 transition-colors">
+                  Academic Programs
+                </Link>
+              </li>
+              <li>
+                <a href="#" className="hover:text-orange-600 transition-colors">Research</a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-orange-600 transition-colors">Library</a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-orange-600 transition-colors">E-Learning</a>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 className="text-lg font-semibold mb-4">Resources</h4>
+            <ul className="space-y-2 text-gray-400">
+              <li>
+                <a href="/login" className="hover:text-orange-600 transition-colors">
+                  Student Portal
+                </a>
+              </li>
+              <li>
+                <a href="/login" className="hover:text-orange-600 transition-colors">
+                  Faculty Portal
+                </a>
+              </li>
+              <li>
+                <button 
+                  onClick={() => scrollToSection('programs')}
+                  className="hover:text-orange-600 transition-colors text-left"
+                >
+                  Career Services
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => scrollToSection('placements')}
+                  className="hover:text-orange-600 transition-colors text-left"
+                >
+                  Records
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => scrollToSection('events')}
+                  className="hover:text-orange-600 transition-colors text-left"
+                >
+                  News
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
-      </footer>
+        
+        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <p>&copy; 2024 Oxford College of Engineering. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
 
       {/* Modals */}
       {showLoginModal && (
