@@ -5,6 +5,7 @@ import {
   Globe, BookOpen, Zap, Target, TrendingUp, Facebook, Instagram, Linkedin, Youtube, CheckCircle, LogIn,
   User, Lock, Eye, EyeOff, Clock
 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 interface UserData {
   name?: string;
@@ -37,6 +38,9 @@ interface Faculty {
   experience: string;
   image: string;
 }
+
+// Initialize EmailJS
+emailjs.init('K6TgTXs3Uql7altDg');
 
 // Login Modal Component
 const LoginModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
@@ -444,6 +448,15 @@ function App(): JSX.Element {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showEventModal, setShowEventModal] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [inquiryData, setInquiryData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const galleryImages: string[] = [
     'https://images.pexels.com/photos/159844/cellular-education-classroom-159844.jpeg?auto=compress&cs=tinysrgb&w=800',
@@ -567,6 +580,52 @@ function App(): JSX.Element {
   const handleEventRegister = (event: Event) => {
     setSelectedEvent(event);
     setShowEventModal(true);
+  };
+
+  const handleInquiryChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setInquiryData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleInquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError('');
+    
+    try {
+      await emailjs.send(
+        'service_p0ouk16',
+        'template_o3z10p5',
+        {
+          user_name: inquiryData.name,
+          user_email: inquiryData.email,
+          user_phone: inquiryData.phone,
+          message: inquiryData.message,
+          reply_to: inquiryData.email,
+          to_email: 'careers@lifeboxnextgen.co.site'
+        }
+      );
+      
+      setSubmitSuccess(true);
+      setInquiryData({
+        name: '',
+        email: '',
+        phone: '',
+        message: ''
+      });
+      
+      setTimeout(() => {
+        setSubmitSuccess(false);
+      }, 5000);
+    } catch (error) {
+      console.error('Failed to send inquiry:', error);
+      setSubmitError('Failed to send your inquiry. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -955,20 +1014,48 @@ function App(): JSX.Element {
 
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Inquiry</h3>
-                <form className="space-y-5">
+                {submitSuccess && (
+                  <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
+                    Thank you for your inquiry! We'll get back to you soon.
+                  </div>
+                )}
+                {submitError && (
+                  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+                    {submitError}
+                  </div>
+                )}
+                <form onSubmit={handleInquirySubmit} className="space-y-5">
                   <input 
                     type="text" 
+                    name="name"
+                    value={inquiryData.name}
+                    onChange={handleInquiryChange}
                     placeholder="Full Name"
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
                   />
                   <input 
                     type="email" 
+                    name="email"
+                    value={inquiryData.email}
+                    onChange={handleInquiryChange}
                     placeholder="Email Address"
                     required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
                   />
+                  <input 
+                    type="tel" 
+                    name="phone"
+                    value={inquiryData.phone}
+                    onChange={handleInquiryChange}
+                    placeholder="Phone Number"
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
+                  />
                   <textarea 
+                    name="message"
+                    value={inquiryData.message}
+                    onChange={handleInquiryChange}
                     placeholder="Your Message" 
                     rows={4}
                     required
@@ -976,9 +1063,10 @@ function App(): JSX.Element {
                   ></textarea>
                   <button 
                     type="submit"
-                    className="w-full bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors"
+                    disabled={isSubmitting}
+                    className="w-full bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors disabled:bg-orange-400"
                   >
-                    Submit Inquiry
+                    {isSubmitting ? 'Sending...' : 'Submit Inquiry'}
                   </button>
                 </form>
               </div>
