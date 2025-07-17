@@ -222,13 +222,17 @@ const Navbar: React.FC = () => {
                       <span>Settings</span>
                     </button>
                     <hr className="my-1 border-slate-700" />
-                    <button
-                      onClick={logout}
-                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-red-400 hover:bg-slate-700/50"
+                  <button
+                   onClick={() => {
+                     logout();
+                    navigate('/');
+                    }}
+                     className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-red-400 hover:bg-slate-700/50"
                     >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign out</span>
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign out</span>
                     </button>
+
                   </motion.div>
                 )}
               </AnimatePresence>
