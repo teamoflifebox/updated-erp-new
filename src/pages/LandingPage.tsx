@@ -226,69 +226,433 @@ const CourseModal: React.FC<{ isOpen: boolean; onClose: () => void; course: Cour
 };
 
 // Event Registration Modal Component
-const EventRegistrationModal: React.FC<{ isOpen: boolean; onClose: () => void; event: Event | null }> = ({ isOpen, onClose, event }) => {
+interface Event {
+  id?: string;
+  title: string;
+  date: string;
+  type: string;
+  description: string;
+  status?: 'upcoming' | 'completed' | 'ongoing';
+  location?: string;
+  capacity?: number;
+  registered?: number;
+}
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  event: Event | null;
+  onViewMore?: () => void;
+  onRegisterSubmit?: (registrationData: any) => void;
+}
+
+const EventRegistrationModal: React.FC<ModalProps> = ({ isOpen, onClose, event, onViewMore, onRegisterSubmit }) => {
+  const [isRegistering, setIsRegistering] = React.useState(false);
+  const [formData, setFormData] = React.useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    experience: ''
+  });
+  const [isSubmitted, setIsSubmitted] = React.useState(false);
+
   if (!isOpen || !event) return null;
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmitRegistration = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsRegistering(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsRegistering(false);
+      setIsSubmitted(true);
+      if (onRegisterSubmit) {
+        onRegisterSubmit({ ...formData, eventId: event.id });
+      }
+    }, 1500);
+  };
+
+  const resetModal = () => {
+    setIsSubmitted(false);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      company: '',
+      experience: ''
+    });
+  };
+
+  const handleClose = () => {
+    resetModal();
+    onClose();
+  };
+
+  // Determine if event is completed
+  const isCompleted = event.status === 'completed';
+  const isUpcoming = event.status === 'upcoming';
+  const isOngoing = event.status === 'ongoing';
+
+  // Show success message after registration
+  if (isSubmitted && !isCompleted) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 backdrop-blur-sm"
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            handleClose();
+          }
+        }}
+      >
+        <div 
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between rounded-t-2xl z-10">
+            <h2 className="text-xl font-bold text-gray-900">Registration Successful!</h2>
+            <button
+              onClick={handleClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+              aria-label="Close Modal"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
+
+          {/* Body */}
+          <div className="p-6 text-center">
+            <div className="bg-green-100 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-12 h-12 text-green-600" />
+            </div>
+
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Registration Successful!</h3>
+            <p className="text-gray-600 mb-6">
+              Thank you for registering! We will send you confirmation details and event information soon.
+            </p>
+
+            <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+              <h4 className="font-semibold text-gray-900 mb-3">{event.title}</h4>
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  <span>{event.date}</span>
+                </div>
+                {event.location && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>{event.location}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded-full text-xs font-medium">
+                    {event.type}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="sticky bottom-0 bg-white p-6 border-t border-gray-200 rounded-b-2xl">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleClose}
+                className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-semibold"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  resetModal();
+                  onViewMore?.();
+                }}
+                className="flex-1 bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors duration-200 font-semibold"
+              >
+                View More Events
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Event Registration</h2>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
+    >
+      <div 
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-white p-6 border-b border-gray-200 flex items-center justify-between rounded-t-2xl z-10">
+          <h2 className="text-xl font-bold text-gray-900">
+            {isCompleted ? 'Event Registration' : 'Register for Event'}
+          </h2>
           <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            onClick={handleClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+            aria-label="Close Modal"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
-        <div className="p-6 text-center">
-          <div className="bg-green-100 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-12 h-12 text-green-600" />
-          </div>
-          
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Event Completed!</h3>
-          <p className="text-gray-600 mb-6">
-            Thank you for your interest in this event. This event has already been completed successfully.
-          </p>
-
-          <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
-            <h4 className="font-semibold text-gray-900 mb-3">{event.title}</h4>
-            <div className="space-y-2 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>{event.date}</span>
+        {/* Body */}
+        <div className="p-6">
+          {isCompleted ? (
+            /* Completion Message */
+            <div className="text-center">
+              <div className="bg-green-100 rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="w-12 h-12 text-green-600" />
               </div>
-              <div className="flex items-center gap-2">
-                <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded-full text-xs font-medium">
-                  {event.type}
-                </span>
+
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Event Completed!</h3>
+              <p className="text-gray-600 mb-6">
+                Thank you for your interest. This event has already been successfully completed.
+              </p>
+
+              <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+                <h4 className="font-semibold text-gray-900 mb-3">{event.title}</h4>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>{event.date}</span>
+                  </div>
+                  {event.location && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>{event.location}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="bg-orange-100 text-orange-600 px-2 py-1 rounded-full text-xs font-medium">
+                      {event.type}
+                    </span>
+                    <span className="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs font-medium">
+                      Completed
+                    </span>
+                  </div>
+                </div>
+                <p className="text-gray-700 mt-3 text-sm">{event.description}</p>
+              </div>
+
+              <div className="text-sm text-gray-600 mb-6">
+                <p className="mb-2">Stay tuned for upcoming events!</p>
+                <p>Follow us or check our page regularly for new opportunities.</p>
               </div>
             </div>
-            <p className="text-gray-700 mt-3 text-sm">{event.description}</p>
-          </div>
+          ) : (
+            /* Registration Form */
+            <div>
+              <div className="text-center mb-6">
+                <div className={`${isUpcoming ? 'bg-blue-100' : 'bg-orange-100'} rounded-full p-4 w-20 h-20 flex items-center justify-center mx-auto mb-4`}>
+                  <User className={`w-12 h-12 ${isUpcoming ? 'text-blue-600' : 'text-orange-600'}`} />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  {isUpcoming ? 'Register for Event' : 'Join Event Now'}
+                </h3>
+                <p className="text-gray-600">
+                  {isUpcoming 
+                    ? 'Fill out the form below to register for this upcoming event.'
+                    : 'This event is currently ongoing. Register now to join!'
+                  }
+                </p>
+              </div>
 
-          <div className="text-sm text-gray-600 mb-6">
-            <p className="mb-2">Stay tuned for upcoming events!</p>
-            <p>Follow our social media or check our events page for the latest updates.</p>
-          </div>
+              {/* Event Details */}
+              <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                <h4 className="font-semibold text-gray-900 mb-3">{event.title}</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>{event.date}</span>
+                  </div>
+                  {event.location && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>{event.location}</span>
+                    </div>
+                  )}
+                  {event.capacity && event.registered && (
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      <span>{event.registered}/{event.capacity} registered</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      isUpcoming ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'
+                    }`}>
+                      {event.type}
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button 
-              onClick={onClose}
-              className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors font-semibold"
-            >
-              Close
-            </button>
-            <button className="flex-1 bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors font-semibold">
-              View More Events
-            </button>
-          </div>
+              {/* Registration Form */}
+              <form onSubmit={handleSubmitRegistration} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      required
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
+                      Company/Organization
+                    </label>
+                    <input
+                      type="text"
+                      id="company"
+                      name="company"
+                      value={formData.company}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      placeholder="Enter your company"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="experience" className="block text-sm font-medium text-gray-700 mb-1">
+                    Experience Level
+                  </label>
+                  <select
+                    id="experience"
+                    name="experience"
+                    value={formData.experience}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  >
+                    <option value="">Select your experience level</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="expert">Expert</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+
+        {/* Footer - Always visible */}
+        <div className="sticky bottom-0 bg-white p-6 border-t border-gray-200 rounded-b-2xl">
+          {isCompleted ? (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleClose}
+                className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-semibold"
+              >
+                Close
+              </button>
+              <button
+                onClick={onViewMore}
+                className="flex-1 bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors duration-200 font-semibold"
+              >
+                View More Events
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                onClick={handleSubmitRegistration}
+                disabled={isRegistering || !formData.name || !formData.email}
+                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors duration-200 ${
+                  isRegistering || !formData.name || !formData.email
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : isUpcoming
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-orange-600 hover:bg-orange-700 text-white'
+                }`}
+              >
+                {isRegistering ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Registering...
+                  </span>
+                ) : (
+                  isUpcoming ? 'Register Now' : 'Join Event'
+                )}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
 
 // Main App Component
 function App(): JSX.Element {
@@ -817,124 +1181,135 @@ function App(): JSX.Element {
 
       {/* Contact Section */}
       <section id="contact" className="py-20 bg-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Contact Us</h2>
-            <p className="text-xl text-gray-600">We'd love to hear from you! Reach out with any questions or feedback.</p>
-          </div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-16">
+      <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Contact Us</h2>
+      <p className="text-xl text-gray-600">
+        We'd love to hear from you! Reach out with any questions or feedback.
+      </p>
+    </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div>
-              <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h3>
-                <ul className="space-y-5 text-gray-700 text-base">
-                  <li className="flex items-start gap-4">
-                    <MapPin className="w-6 h-6 text-orange-600 mt-1" />
-                    <div>
-                      <p className="font-semibold">Address</p>
-                      <p>
-                        8-256/1, Dasaripalem (V),<br />
-                        Vipparla (Post), Palnadu (Dist),<br />
-                        Andhra Pradesh - 522615
-                      </p>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <Phone className="w-6 h-6 text-orange-600 mt-1" />
-                    <div>
-                      <p className="font-semibold">Phone</p>
-                      <p>+91 9133843912</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-4">
-                    <Mail className="w-6 h-6 text-orange-600 mt-1" />
-                    <div>
-                      <p className="font-semibold">Email</p>
-                      <p>careers@lifeboxnextgen.co.site</p>
-                    </div>
-                  </li>
-                </ul>
+    <div className="grid lg:grid-cols-2 gap-12">
+      <div>
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h3>
+          <ul className="space-y-5 text-gray-700 text-base">
+            <li className="flex items-start gap-4">
+              <MapPin className="w-6 h-6 text-orange-600 mt-1" />
+              <div>
+                <p className="font-semibold">Address</p>
+                <p>
+                  8-256/1, Dasaripalem (V),<br />
+                  Vipparla (Post), Palnadu (Dist),<br />
+                  Andhra Pradesh - 522615
+                </p>
               </div>
+            </li>
+            <li className="flex items-start gap-4">
+              <Phone className="w-6 h-6 text-orange-600 mt-1" />
+              <div>
+                <p className="font-semibold">Phone</p>
+                <p>+91 9133843912</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-4">
+              <Mail className="w-6 h-6 text-orange-600 mt-1" />
+              <div>
+                <p className="font-semibold">Email</p>
+                <p>careers@lifeboxnextgen.co.site</p>
+              </div>
+            </li>
+          </ul>
+        </div>
 
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Inquiry</h3>
-                {submitSuccess && (
-                  <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
-                    Thank you for your inquiry! We'll get back to you soon.
-                  </div>
-                )}
-                {submitError && (
-                  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
-                    {submitError}
-                  </div>
-                )}
-                <form onSubmit={handleInquirySubmit} className="space-y-5">
-                  <input 
-                    type="text" 
-                    name="name"
-                    value={inquiryData.name}
-                    onChange={handleInquiryChange}
-                    placeholder="Full Name"
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
-                  />
-                  <input 
-                    type="email" 
-                    name="email"
-                    value={inquiryData.email}
-                    onChange={handleInquiryChange}
-                    placeholder="Email Address"
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
-                  />
-                  <input 
-                    type="tel" 
-                    name="phone"
-                    value={inquiryData.phone}
-                    onChange={handleInquiryChange}
-                    placeholder="Phone Number"
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
-                  />
-                  <textarea 
-                    name="message"
-                    value={inquiryData.message}
-                    onChange={handleInquiryChange}
-                    placeholder="Your Message" 
-                    rows={4}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
-                  ></textarea>
-                  <button 
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors disabled:bg-orange-400"
-                  >
-                    {isSubmitting ? 'Sending...' : 'Submit Inquiry'}
-                  </button>
-                </form>
-              </div>
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">Quick Inquiry</h3>
+          {submitSuccess && (
+            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
+              Thank you for your inquiry! We'll get back to you soon.
             </div>
-
-            <div>
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
-                <h3 className="text-2xl font-bold text-gray-900 px-8 pt-8">Visit Our Campus</h3>
-                <div className="mt-6">
-                  <iframe
-                    title="Campus Location"
-                    width="100%"
-                    height="360"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    allowFullScreen
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119052.3732031214!2d79.61010132858258!3d16.290234678257885!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b20a92c7b2eb3%3A0xfdb3c8d3932a820e!2sPalnadu%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1628949581449!5m2!1sen!2sin"
-                  ></iframe>
-                </div>
-              </div>
+          )}
+          {submitError && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+              {submitError}
             </div>
+          )}
+          <form onSubmit={handleInquirySubmit} className="space-y-5">
+            <input 
+              type="text" 
+              name="name"
+              value={inquiryData.name}
+              onChange={handleInquiryChange}
+              placeholder="Full Name"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
+            />
+            <input 
+              type="email" 
+              name="email"
+              value={inquiryData.email}
+              onChange={handleInquiryChange}
+              placeholder="Email Address"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
+            />
+            <input 
+              type="tel" 
+              name="phone"
+              value={inquiryData.phone}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d*$/.test(value)) {
+                  handleInquiryChange(e);
+                }
+              }}
+              placeholder="Phone Number"
+              required
+              pattern="\d{10}"
+              maxLength={10}
+              minLength={10}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
+            />
+            <textarea 
+              name="message"
+              value={inquiryData.message}
+              onChange={handleInquiryChange}
+              placeholder="Your Message" 
+              rows={4}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 outline-none"
+            ></textarea>
+            <button 
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors disabled:bg-orange-400"
+            >
+              {isSubmitting ? 'Sending...' : 'Submit Inquiry'}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div>
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden h-full">
+          <h3 className="text-2xl font-bold text-gray-900 px-8 pt-8">Visit Our Campus</h3>
+          <div className="mt-6">
+            <iframe
+              title="Campus Location"
+              width="100%"
+              height="360"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119052.3732031214!2d79.61010132858258!3d16.290234678257885!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b20a92c7b2eb3%3A0xfdb3c8d3932a820e!2sPalnadu%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1628949581449!5m2!1sen!2sin"
+            ></iframe>
           </div>
         </div>
-      </section>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
